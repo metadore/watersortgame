@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How It Works — Aqua Sort</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────────────────────────────── */
+:root {
+  --bg-0:#050810;--bg-1:#0a0f1e;--bg-2:#0f1628;--bg-3:#16203a;
+  --border:rgba(80,160,255,.15);--border-glow:rgba(0,212,255,.4);
+  --text-1:#e8f0ff;--text-2:#8ba4cc;--text-3:#4a6080;
+  --accent:#00d4ff;--accent-2:#7b2fff;--accent-win:#00ff88;
+  --radius:14px;--radius-sm:8px;
+  --font-head:'Orbitron',sans-serif;--font-body:'Exo 2',sans-serif;
+  --font-code:'Fira Code',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg-0);color:var(--text-1);font-family:var(--font-body);font-size:15px;line-height:1.7}
+body::before{content:'';position:fixed;inset:0;z-index:-1;
+  background:linear-gradient(rgba(0,212,255,.025) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,212,255,.025) 1px,transparent 1px);
+  background-size:40px 40px;animation:bgScroll 40s linear infinite}
+@keyframes bgScroll{to{background-position:40px 40px}}
+
+/* ── HEADER ─────────────────────────────────────────────────────── */
+.hdr{display:flex;align-items:center;justify-content:space-between;
+  padding:.75rem 2.5rem;background:rgba(10,15,30,.9);
+  border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(12px)}
+.logo{font-family:var(--font-head);font-size:1.2rem;font-weight:900;
+  letter-spacing:3px;color:var(--accent);text-shadow:0 0 18px rgba(0,212,255,.5)}
+.back-btn{padding:.4rem 1rem;border-radius:20px;background:var(--bg-3);
+  border:1px solid var(--border);color:var(--text-2);text-decoration:none;
+  font-size:.85rem;font-weight:600;transition:.2s}
+.back-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── LAYOUT ─────────────────────────────────────────────────────── */
+.page{max-width:960px;margin:0 auto;padding:3rem 2rem 6rem}
+
+h1{font-family:var(--font-head);font-size:2rem;color:var(--accent);
+  letter-spacing:3px;margin-bottom:.5rem;text-align:center}
+.subtitle{color:var(--text-2);text-align:center;margin-bottom:3rem;font-size:1.1rem}
+
+/* ── TOC ────────────────────────────────────────────────────────── */
+.toc{background:var(--bg-1);border:1px solid var(--border);
+  border-radius:var(--radius);padding:1.5rem 2rem;margin-bottom:3rem}
+.toc h3{font-family:var(--font-head);font-size:.8rem;letter-spacing:2px;
+  color:var(--text-3);margin-bottom:1rem;text-transform:uppercase}
+.toc ol{padding-left:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:.3rem}
+.toc a{color:var(--text-2);text-decoration:none;font-size:.9rem;
+  transition:.2s}.toc a:hover{color:var(--accent)}
+
+/* ── SECTION ────────────────────────────────────────────────────── */
+.section{margin-bottom:4rem}
+.section-tag{font-family:var(--font-head);font-size:.65rem;letter-spacing:3px;
+  color:var(--accent-2);text-transform:uppercase;display:block;margin-bottom:.5rem}
+.section h2{font-family:var(--font-head);font-size:1.35rem;color:var(--text-1);
+  letter-spacing:1px;margin-bottom:1.2rem;padding-bottom:.6rem;
+  border-bottom:1px solid var(--border)}
+.section p{color:var(--text-2);margin-bottom:1rem}
+
+/* ── FLOW DIAGRAM ───────────────────────────────────────────────── */
+.flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:1.5rem 0}
+.flow-box{background:var(--bg-2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:.7rem 1rem;
+  font-size:.85rem;color:var(--text-1);font-weight:600;white-space:nowrap;
+  transition:.3s;position:relative;overflow:hidden}
+.flow-box::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent 60%,rgba(0,212,255,.06));
+  pointer-events:none}
+.flow-box.active{border-color:var(--accent);box-shadow:0 0 16px rgba(0,212,255,.3);
+  color:var(--accent)}
+.flow-box.backend{border-color:var(--accent-2);color:var(--accent-2)}
+.flow-box.success{border-color:var(--accent-win);color:var(--accent-win)}
+.flow-arrow{color:var(--text-3);font-size:1.2rem;flex-shrink:0}
+
+/* ── CODE BLOCK ─────────────────────────────────────────────────── */
+.code-block{background:rgba(0,0,0,.4);border:1px solid var(--border);
+  border-radius:var(--radius-sm);overflow:hidden;margin:1.2rem 0}
+.code-header{padding:.4rem 1rem;background:var(--bg-3);font-size:.7rem;
+  font-family:var(--font-head);letter-spacing:2px;color:var(--text-3);
+  border-bottom:1px solid var(--border);display:flex;justify-content:space-between;
+  align-items:center}
+.code-lang{color:var(--accent-2)}
+pre{padding:1.2rem;overflow-x:auto;font-family:var(--font-code);
+  font-size:.82rem;line-height:1.6;color:var(--text-1)}
+.kw{color:#c792ea}.fn{color:#82aaff}.str{color:#c3e88d}
+.num{color:#f78c6c}.cm{color:#546e7a}.cls{color:#ffcb6b}
+.var{color:#eeffff}
+
+/* ── ANIMATION DEMO ─────────────────────────────────────────────── */
+.demo-zone{background:var(--bg-1);border:1px solid var(--border-glow);
+  border-radius:var(--radius);padding:2rem;margin:1.5rem 0;
+  display:flex;flex-direction:column;align-items:center;gap:1.5rem}
+.demo-title{font-family:var(--font-head);font-size:.75rem;letter-spacing:2px;
+  color:var(--accent);text-transform:uppercase}
+
+/* Mini tubes */
+.mini-tubes{display:flex;gap:20px;align-items:flex-end}
+.mini-tube-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.mini-tube{width:44px;height:120px;border:2px solid var(--border);
+  border-radius:0 0 22px 22px;display:flex;flex-direction:column-reverse;
+  background:rgba(0,0,0,.3);overflow:hidden;position:relative;
+  transition:border-color .3s}
+.mini-tube.src{border-color:var(--accent);box-shadow:0 0 16px rgba(0,212,255,.4)}
+.mini-tube.dst{border-color:var(--accent-win);box-shadow:0 0 16px rgba(0,255,136,.3)}
+.mini-layer{width:100%;height:30px;flex-shrink:0;position:relative;overflow:hidden}
+.mini-layer::before{content:'';position:absolute;top:0;left:-50%;width:50%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+  animation:shimmer 2s ease-in-out infinite}
+@keyframes shimmer{0%{left:-60%}100%{left:120%}}
+.mini-label{font-size:.65rem;color:var(--text-3);font-family:var(--font-head)}
+
+/* Simulate button */
+.sim-btn{padding:.6rem 1.8rem;border-radius:var(--radius-sm);
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  border:none;color:#fff;font-family:var(--font-body);font-weight:700;
+  font-size:.85rem;cursor:pointer;transition:.2s;letter-spacing:.5px}
+.sim-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,212,255,.35)}
+.sim-btn:disabled{opacity:.5;cursor:default;transform:none}
+
+/* Status log */
+.status-log{width:100%;max-width:480px;font-family:var(--font-code);
+  font-size:.78rem;color:var(--text-2);
+  background:rgba(0,0,0,.35);border-radius:var(--radius-sm);
+  padding:.8rem 1rem;min-height:80px;border:1px solid var(--border)}
+.log-line{margin-bottom:.2rem}
+.log-line.info{color:var(--accent)}
+.log-line.ok{color:var(--accent-win)}
+.log-line.err{color:#ff4466}
+.log-line.api{color:var(--accent-2)}
+
+/* ── HIGHLIGHT BOX ──────────────────────────────────────────────── */
+.callout{padding:1rem 1.4rem;border-radius:var(--radius-sm);margin:1rem 0;
+  border-left:3px solid var(--accent);background:rgba(0,212,255,.05)}
+.callout.tip{border-color:var(--accent-win);background:rgba(0,255,136,.05)}
+.callout.warn{border-color:#ffd700;background:rgba(255,215,0,.05)}
+.callout strong{color:var(--accent)}
+.callout.tip strong{color:var(--accent-win)}
+.callout.warn strong{color:#ffd700}
+
+/* ── STEP TIMELINE ───────────────────────────────────────────────── */
+.timeline{position:relative;padding-left:2.5rem;margin:1.5rem 0}
+.timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;
+  width:2px;background:linear-gradient(180deg,var(--accent),var(--accent-2))}
+.tl-item{position:relative;margin-bottom:1.5rem}
+.tl-dot{position:absolute;left:-2.5rem;top:4px;width:22px;height:22px;
+  border-radius:50%;background:var(--bg-3);border:2px solid var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:700;color:var(--accent);
+  font-family:var(--font-head)}
+.tl-title{font-weight:700;color:var(--text-1);margin-bottom:.3rem}
+.tl-desc{color:var(--text-2);font-size:.9rem}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────────── */
+@media(max-width:640px){
+  .toc ol{grid-template-columns:1fr}
+  .flow{flex-direction:column;align-items:flex-start}
+  .page{padding:2rem 1rem 4rem}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <span class="logo">💧 AQUA SORT</span>
+  <a href="/" class="back-btn">← Back to Game</a>
+</header>
+
+<main class="page">
+  <h1>How It Works</h1>
+  <p class="subtitle">A deep-dive into the architecture, algorithms, and flow behind the Water Sort Puzzle</p>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h3>Contents</h3>
+    <ol>
+      <li><a href="#click">1. Tube Click Handler</a></li>
+      <li><a href="#api">2. API Request Flow</a></li>
+      <li><a href="#validation">3. Move Validation</a></li>
+      <li><a href="#state">4. State Management</a></li>
+      <li><a href="#render">5. UI Re-render</a></li>
+      <li><a href="#ai">6. AI Solver</a></li>
+      <li><a href="#difficulty">7. Dynamic Difficulty</a></li>
+      <li><a href="#voice">8. Voice Control</a></li>
+      <li><a href="#simulate">9. Live Simulation</a></li>
+    </ol>
+  </div>
+
+  <!-- 1 ─────────────────────────────────────────────────────────── -->
+  <div class="section" id="click">
+    <span class="section-tag">Step 01</span>
+    <h2>Tube Click Handler</h2>
+    <p>When a player clicks a tube, the browser captures the click event and routes it through a two-phase interaction system: <strong>source selection</strong>, then <strong>destination selection</strong>.</p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot">1</div>
+        <div class="tl-title">First Click — Select Source</div>
+        <div class="tl-desc">If no tube is selected, the clicked tube becomes the source. It is visually highlighted with a cyan glow border.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">2</div>
+        <div class="tl-title">Same Tube — Deselect</div>
+        <div class="tl-desc">Clicking the same tube again cancels the selection gracefully.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">3</div>
+        <div class="tl-title">Second Click — Pour Attempt</div>
+        <div class="tl-desc">A different tube is clicked → the frontend sends a POST /api/move request with <code>from_tube</code> and <code>to_tube</code>.</div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span>Frontend — app.js</span><span class="code-lang">JavaScript</span></div>
+      <pre><span class="kw">async function</span> <span class="fn">onTubeClick</span>(idx) {
+  <span class="kw">if</span> (State.selectedTube === <span class="kw">null</span>) {
+    State.selectedTube = idx;           <span class="cm">// Phase 1: select source</span>
+    <span class="fn">setTubeSelected</span>(idx, <span class="kw">true</span>);
+    <span class="kw">return</span>;
+  }
+  <span class="kw">const</span> src = State.selectedTube;
+  <span class="fn">setTubeSelected</span>(src, <span class="kw">false</span>);
+  State.selectedTube = <span class="kw">null</span>;
+  <span class="kw">await</span> <span class="fn">executePour</span>(src, idx); <span class="cm">// Phase 2: pour</span>
+}</pre>
+    </div>
+
+    <div class="callout tip"><strong>UX note:</strong> The selected tube state is held in-memory (never sent to backend). The backend is stateless per request — session state lives in the Python <code>sessions</code> dict.</div>
+  </div>
+
+  <!-- 2 ─────────────────────────────────────────────────────────── -->
+  <div class="section" id="api">
+    <span class="section-tag">Step 02</span>
+    <h2>API Request Flow</h2>
+    <p>Every action is a clean REST call. The frontend never stores game logic — the backend owns the authoritative state.</p>
+
+    <div class="flow">
+      <div class="flow-box active">🖱 User Click</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">fetch() POST</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box backend">Flask /api/move</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box backend">GameEngine.pour()</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box success">JSON Response</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">DOM Update</div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span>Backend — app.py</span><span class="code-lang">Python / Flask</span></div>
+      <pre><span class="cls">@app</span>.<span class="fn">route</span>(<span class="str">"/api/move"</span>, methods=[<span class="str">"POST"</span>])
+<span class="kw">def</span> <span class="fn">make_move</span>():
+    data = request.<span class="fn">get_json</span>()
+    engine = sessions[data[<span class="str">"session_id"</span>]][<span class="str">"engine"</span>]
+    success, reason, moved = engine.<span class="fn">pour</span>(
+        data[<span class="str">"from_tube"</span>], data[<span class="str">"to_tube"</span>]
+    )
+    <span class="kw">return</span> <span class="fn">jsonify</span>({
+        <span class="str">"success"</span>: success,
+        <span class="str">"tubes"</span>: engine.<span class="fn">snapshot</span>(),
+        <span class="str">"is_won"</span>: engine.<span class="fn">is_won</span>(),
+        <span class="str">"move_count"</span>: engine.move_count,
+    })</pre>
+    </div>
+  </div>
+
+  <!-- 3 ─────────────────────────────────────────────────────────── -->
+  <div class="section" id="validation">
+    <span class="section-tag">Step 03</span>
+    <h2>Move Validation</h2>
+    <p>All validation happens inside <code>GameEngine.can_pour(src, dst)</code>. The rules are applied in strict priority order:</p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot">✓</div>
+        <div class="tl-title">Same-tube check</div>
+        <div class="tl-desc">src == dst → rejected immediately.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">✓</div>
+        <div class="tl-title">Source not empty</div>
+        <div class="tl-desc">Can't pour from an empty tube.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">✓</div>
+        <div class="tl-title">Destination not full</div>
+        <div class="tl-desc">Tube at capacity → no room to receive.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">✓</div>
+        <div class="tl-title">Color match (or empty destination)</div>
+        <div class="tl-desc">Top color of source must equal top color of destination, OR destination is empty.</div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span>Backend — game_engine.py</span><span class="code-lang">Python</span></div>
+      <pre><span class="kw">def</span> <span class="fn">can_pour</span>(<span class="var">self</span>, src: <span class="cls">int</span>, dst: <span class="cls">int</span>):
+    s, d = <span class="var">self</span>.tubes[src], <span class="var">self</span>.tubes[dst]
+    <span class="kw">if</span> s.<span class="fn">is_empty</span>():   <span class="kw">return</span> <span class="kw">False</span>, <span class="str">"Empty source"</span>
+    <span class="kw">if</span> d.<span class="fn">is_full</span>():    <span class="kw">return</span> <span class="kw">False</span>, <span class="str">"Destination full"</span>
+    <span class="kw">if</span> d.<span class="fn">is_empty</span>():   <span class="kw">return</span> <span class="kw">True</span>,  <span class="str">"OK"</span>
+    <span class="kw">if</span> s.<span class="fn">top_color</span>() != d.<span class="fn">top_color</span>():
+        <span class="kw">return</span> <span class="kw">False</span>, <span class="str">"Color mismatch"</span>
+    <span class="kw">return</span> <span class="kw">True</span>, <span class="str">"OK"</span></pre>
+    </div>
+
+    <div class="callout warn"><strong>Key insight:</strong> When pouring, all consecutive top-matching layers move together. If T1 has [red, red, blue] and T2 is empty, pouring moves <em>two</em> red layers at once.</div>
+  </div>
+
+  <!-- 4 ─────────────────────────────────────────────────────────── -->
+  <div class="section" id="state">
+    <span class="section-tag">Step 04</span>
+    <h2>State Management</h2>
+    <p>The game state is a pure Python dict, serializable to JSON at any time. The undo stack stores deep-copy snapshots before each move.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span>State Schema</span><span class="code-lang">JSON</span></div>
+      <pre>{
+  <span class="str">"tubes"</span>: [
+    { <span class="str">"capacity"</span>: <span class="num">4</span>, <span class="str">"layers"</span>: [<span class="str">"red"</span>, <span class="str">"blue"</span>, <span class="str">"red"</span>] },
+    { <span class="str">"capacity"</span>: <span class="num">4</span>, <span class="str">"layers"</span>: [] }
+  ],
+  <span class="str">"move_count"</span>: <span class="num">7</span>,
+  <span class="str">"click_heatmap"</span>: { <span class="str">"0"</span>: <span class="num">3</span>, <span class="str">"1"</span>: <span class="num">8</span> },
+  <span class="str">"move_history"</span>: [[<span class="num">0</span>,<span class="num">1</span>],[<span class="num">2</span>,<span class="num">0</span>]]
+}</pre>
+    </div>
+
+    <p>The state is persisted to SQLite via <code>models.save_game()</code> after each successful move, enabling save/load across browser sessions.</p>
+  </div>
+
+  <!-- 5 ─────────────────────────────────────────────────────────── -->
+  <div class="section" id="render">
+    <span class="section-tag">Step 05</span>
+    <h2>UI Re-render</h2>
+    <p>After a successful API response, the frontend performs a <strong>targeted partial re-render</strong> — only updating the liquid layers inside each tube, not rebuilding the entire DOM.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span>Frontend — app.js</span><span class="code-lang">JavaScript</span></div>
+      <pre><span class="kw">function</span> <span class="fn">updateTubeState</span>(tubes) {
+  <span class="kw">const</span> wraps = document.<span class="fn">querySelectorAll</span>(<span class="str">".tube-wrap"</span>);
+  tubes.<span class="fn">forEach</span>((tube, idx) =&gt; {
+    <span class="kw">const</span> tubeEl = wraps[idx].<span class="fn">querySelector</span>(<span class="str">".tube"</span>);
+    tubeEl.innerHTML = <span class="str">""</span>;                    <span class="cm">// clear layers</span>
+    tube.layers.<span class="fn">forEach</span>((color) =&gt; {
+      <span class="kw">const</span> layer = document.<span class="fn">createElement</span>(<span class="str">"div"</span>);
+      layer.className = <span class="str">`liquid-layer layer-</span>${color}<span class="str">`</span>;
+      layer.style.height = <span class="str">`</span>${layerH}<span class="str">px`</span>;
+      tubeEl.<span class="fn">appendChild</span>(layer);
+    });
+  });
+}</pre>
+    </div>
+
+    <div class="callout"><strong>Gradient layers:</strong> Each color class (e.g. <code>.layer-red</code>) applies a CSS <code>linear-gradient</code> background, giving the multicolor liquid appearance. The shimmer animation is handled by a <code>::before</code> pseudo-element.</div>
+  </div>
+
+  <!-- 6 ─────────────────────────────────────────────────────────── -->
+  <div class="section" id="ai">
+    <span class="section-tag">Step 06</span>
+    <h2>AI Solver (BFS / A*)</h2>
+    <p>The AI solver uses <strong>BFS</strong> for small puzzles (guaranteed optimal) and falls back to <strong>A*</strong> for complex states.</p>
+
+    <div class="flow">
+      <div class="flow-box active">Current State</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Generate Moves</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box backend">Apply + Hash</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box backend">Visited Set</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box success">Win Detected</div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span>Backend — ai_solver.py</span><span class="code-lang">Python</span></div>
+      <pre><span class="kw">def</span> <span class="fn">_bfs</span>(<span class="var">self</span>, start):
+    queue = <span class="fn">deque</span>([start])
+    visited = {start.<span class="fn">key</span>()}
+    <span class="kw">while</span> queue:
+        state = queue.<span class="fn">popleft</span>()
+        <span class="kw">for</span> src, dst <span class="kw">in</span> state.<span class="fn">legal_moves</span>():
+            nxt = state.<span class="fn">apply_move</span>(src, dst)
+            <span class="kw">if</span> nxt.<span class="fn">key</span>() <span class="kw">in</span> visited: <span class="kw">continue</span>
+            <span class="kw">if</span> nxt.<span class="fn">is_won</span>(): <span class="kw">return</span> nxt.path
+            visited.<span class="fn">add</span>(nxt.<span class="fn">key</span>())
+            queue.<span class="fn">append</span>(nxt)
+    <span class="kw">return None</span></pre>
+    </div>
+
+    <p>The heuristic for A* counts the number of tubes not yet complete. Each non-finished tube adds 1 to the cost estimate — guiding the search toward solutions faster.</p>
+  </div>
+
+  <!-- 7 ─────────────────────────────────────────────────────────── -->
+  <div class="section" id="difficulty">
+    <span class="section-tag">Step 07</span>
+    <h2>Dynamic Difficulty</h2>
+    <p>After each level is solved, the game compares the player's time to the expected time and adjusts a continuous <code>difficulty_score</code> (0.0–1.0).</p>
+
+    <div class="code-block">
+      <div class="code-header"><span>Backend — difficulty_manager.py</span><span class="code-lang">Python</span></div>
+      <pre><span class="kw">def</span> <span class="fn">adjust</span>(<span class="var">self</span>, level, time_taken, expected_time):
+    ratio = time_taken / <span class="fn">max</span>(expected_time, <span class="num">1</span>)
+    <span class="kw">if</span>   ratio &lt; <span class="num">0.5</span>:  delta = <span class="num">+0.15</span>   <span class="cm"># very fast</span>
+    <span class="kw">elif</span> ratio &lt; <span class="num">0.8</span>:  delta = <span class="num">+0.07</span>
+    <span class="kw">elif</span> ratio &lt; <span class="num">1.2</span>:  delta = <span class="num">0.0</span>
+    <span class="kw">elif</span> ratio &lt; <span class="num">1.8</span>:  delta = <span class="num">-0.07</span>
+    <span class="kw">else</span>:              delta = <span class="num">-0.15</span>   <span class="cm"># very slow</span>
+    <span class="var">self</span>.difficulty_score = <span class="fn">max</span>(<span class="num">0.0</span>, <span class="fn">min</span>(<span class="num">1.0</span>,
+        <span class="var">self</span>.difficulty_score + delta))</pre>
+    </div>
+
+    <p>The difficulty score influences procedural level generation: tube count, color count, number of empty tubes, and scramble depth all scale with it.</p>
+  </div>
+
+  <!-- 8 ─────────────────────────────────────────────────────────── -->
+  <div class="section" id="voice">
+    <span class="section-tag">Step 08</span>
+    <h2>Voice Control</h2>
+    <p>The browser's <strong>Web Speech API</strong> (<code>SpeechRecognition</code>) captures audio, converts it to text, and the transcript is sent to the backend <code>/api/voice-command</code> endpoint.</p>
+
+    <div class="flow">
+      <div class="flow-box active">🎙 Mic Input</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">SpeechRecognition</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Transcript Text</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box backend">Regex Parser</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box success">Game Action</div>
+    </div>
+
+    <p>Supported commands: <em>"Pour red into tube 2"</em> · <em>"Undo move"</em> · <em>"Restart level"</em> · <em>"Hint"</em></p>
+    <div class="callout"><strong>Note:</strong> Voice control requires Chrome or Edge. The browser must have microphone permission.</div>
+  </div>
+
+  <!-- 9 ─────────────────────────────────────────────────────────── -->
+  <div class="section" id="simulate">
+    <span class="section-tag">Step 09</span>
+    <h2>Live Simulation</h2>
+    <p>Click <strong>Simulate Pour</strong> to watch the full request lifecycle in slow motion — from click to DOM update.</p>
+
+    <div class="demo-zone">
+      <div class="demo-title">Interactive Pour Simulation</div>
+
+      <div class="mini-tubes">
+        <!-- Tube 1: source -->
+        <div class="mini-tube-wrap">
+          <div class="mini-tube src" id="simTube1">
+            <div class="mini-layer" style="background:linear-gradient(180deg,#834d9b,#d04ed6)"></div>
+            <div class="mini-layer" style="background:linear-gradient(180deg,#2980b9,#6dd5fa)"></div>
+            <div class="mini-layer" style="background:linear-gradient(180deg,#ff4e50,#fc466b)"></div>
+            <div class="mini-layer" style="background:linear-gradient(180deg,#ff4e50,#fc466b)"></div>
+          </div>
+          <div class="mini-label">Tube 1 (src)</div>
+        </div>
+        <!-- Arrow -->
+        <div style="font-size:2rem;color:var(--accent-2);padding-bottom:40px">→</div>
+        <!-- Tube 2: destination -->
+        <div class="mini-tube-wrap">
+          <div class="mini-tube dst" id="simTube2">
+            <div class="mini-layer" style="background:linear-gradient(180deg,#ff4e50,#fc466b)"></div>
+          </div>
+          <div class="mini-label">Tube 2 (dst)</div>
+        </div>
+      </div>
+
+      <button class="sim-btn" id="simBtn">▶ Simulate Pour</button>
+
+      <div class="status-log" id="simLog">
+        <div class="log-line">Ready — press Simulate to begin…</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── Learn page simulation ─────────────────────────────────────────
+const simBtn = document.getElementById("simBtn");
+const simLog = document.getElementById("simLog");
+const tube1 = document.getElementById("simTube1");
+const tube2 = document.getElementById("simTube2");
+
+function log(msg, type = "") {
+  const line = document.createElement("div");
+  line.className = `log-line ${type}`;
+  line.textContent = msg;
+  simLog.appendChild(line);
+  simLog.scrollTop = simLog.scrollHeight;
+}
+
+let simRunning = false;
+
+simBtn.addEventListener("click", async () => {
+  if (simRunning) return;
+  simRunning = true;
+  simBtn.disabled = true;
+  simLog.innerHTML = "";
+
+  const steps = [
+    { delay: 0,    fn: () => log("[1] User clicks Tube 1 (source)", "info") },
+    { delay: 600,  fn: () => log("[2] State.selectedTube = 0  →  tube highlighted", "info") },
+    { delay: 1200, fn: () => log("[3] User clicks Tube 2 (destination)", "info") },
+    { delay: 1800, fn: () => log("[4] executePour(0, 1) called", "info") },
+    { delay: 2200, fn: () => log('  POST /api/move  {"from_tube":0,"to_tube":1}', "api") },
+    { delay: 2800, fn: () => log("[5] Flask receives request", "api") },
+    { delay: 3200, fn: () => log("  engine.can_pour(0, 1) → checking rules…", "api") },
+    { delay: 3700, fn: () => log("  ✓ Source not empty (layers: [purple,blue,red,red])", "ok") },
+    { delay: 4000, fn: () => log("  ✓ Destination not full (1/4 layers)", "ok") },
+    { delay: 4300, fn: () => log("  ✓ Color match: red == red", "ok") },
+    { delay: 4700, fn: () => log("  Pour approved — moving 2 red layers", "ok") },
+    { delay: 5000, fn: () => { pourAnimation(); log("[6] Pour executed. Snapshot saved to undo stack.", "api"); } },
+    { delay: 5800, fn: () => log("[7] JSON response → {success:true, tubes:[…], is_won:false}", "api") },
+    { delay: 6300, fn: () => log("[8] updateTubeState(tubes) → DOM re-rendered", "info") },
+    { delay: 6800, fn: () => { log("[9] Simulation complete! ✓", "ok"); simBtn.disabled = false; simRunning = false; } },
+  ];
+
+  for (const step of steps) {
+    await delay(step.delay);
+    step.fn();
+  }
+});
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function pourAnimation() {
+  // Remove top 2 red layers from tube1
+  const layers1 = tube1.querySelectorAll(".mini-layer");
+  const toMove = [layers1[layers1.length - 1], layers1[layers1.length - 2]];
+
+  toMove.forEach(l => {
+    l.animate([{opacity:1,transform:"translateY(0)"},{opacity:0,transform:"translateY(-20px)"}],
+      {duration:400,fill:"forwards"}).onfinish = () => l.remove();
+  });
+
+  // Add 2 red layers to tube2 after short delay
+  setTimeout(() => {
+    for (let i = 0; i < 2; i++) {
+      const nl = document.createElement("div");
+      nl.className = "mini-layer";
+      nl.style.background = "linear-gradient(180deg,#ff4e50,#fc466b)";
+      nl.style.opacity = "0";
+      tube2.appendChild(nl);
+      nl.animate([{opacity:0,transform:"translateY(-15px)"},{opacity:1,transform:"translateY(0)"}],
+        {duration:400,fill:"forwards"});
+    }
+  }, 450);
+}
+</script>
+</body>
+</html>

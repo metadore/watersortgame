@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aqua Sort — Water Puzzle</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body data-theme="dark">
+
+<!-- ─── HEADER ──────────────────────────────────────────────────────── -->
+<header class="hdr">
+  <div class="hdr-left">
+    <div class="logo">
+      <span class="logo-drop">💧</span>
+      <span class="logo-text">AQUA SORT</span>
+    </div>
+    <nav class="hdr-nav">
+      <a href="/" class="nav-link active">Game</a>
+      <a href="/learn" class="nav-link">Learn</a>
+    </nav>
+  </div>
+  <div class="hdr-right">
+    <span id="levelBadge" class="badge">LVL 1</span>
+    <span id="moveBadge" class="badge badge-moves">0 Moves</span>
+    <span id="timerBadge" class="badge badge-timer">00:00</span>
+    <button id="darkToggle" class="icon-btn" title="Toggle theme">🌙</button>
+    <button id="analyticsBtn" class="icon-btn" title="Analytics">📊</button>
+    <button id="learnBtn" class="icon-btn" title="How it works">❓</button>
+  </div>
+</header>
+
+<!-- ─── NOTIFICATION ────────────────────────────────────────────────── -->
+<div id="notification" class="notification hidden"></div>
+
+<!-- ─── WIN OVERLAY ─────────────────────────────────────────────────── -->
+<div id="winOverlay" class="overlay hidden">
+  <div class="overlay-card win-card">
+    <div class="win-emoji">🏆</div>
+    <h2>Level Complete!</h2>
+    <p id="winStats"></p>
+    <div class="overlay-btns">
+      <button id="nextLevelBtn" class="btn btn-primary">Next Level →</button>
+      <button id="replayBtn" class="btn btn-ghost">Replay</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ANALYTICS OVERLAY ───────────────────────────────────────────── -->
+<div id="analyticsOverlay" class="overlay hidden">
+  <div class="overlay-card analytics-card">
+    <button class="close-btn" id="closeAnalytics">✕</button>
+    <h2>📊 Analytics</h2>
+    <div class="analytics-grid">
+      <div class="stat-card"><div class="stat-num" id="aSessions">—</div><div class="stat-label">Sessions</div></div>
+      <div class="stat-card"><div class="stat-num" id="aWins">—</div><div class="stat-label">Wins</div></div>
+      <div class="stat-card"><div class="stat-num" id="aAvgMoves">—</div><div class="stat-label">Avg Moves</div></div>
+      <div class="stat-card"><div class="stat-num" id="aAvgTime">—</div><div class="stat-label">Avg Time</div></div>
+    </div>
+    <div class="chart-row">
+      <canvas id="movesChart"></canvas>
+      <canvas id="timeChart"></canvas>
+    </div>
+    <h3 style="margin-top:1.5rem">Tube Heatmap</h3>
+    <div id="heatmapContainer" class="heatmap-row"></div>
+  </div>
+</div>
+
+<!-- ─── SOLUTION OVERLAY ────────────────────────────────────────────── -->
+<div id="solutionOverlay" class="overlay hidden">
+  <div class="overlay-card solution-card">
+    <button class="close-btn" id="closeSolution">✕</button>
+    <h2>🤖 AI Solution</h2>
+    <p id="solutionMsg"></p>
+    <div id="solutionSteps" class="solution-steps"></div>
+    <button id="autoPlayBtn" class="btn btn-primary" style="margin-top:1rem">▶ Auto Play</button>
+  </div>
+</div>
+
+<!-- ─── MAIN LAYOUT ─────────────────────────────────────────────────── -->
+<main class="main-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="control-group">
+      <label class="ctrl-label">Level</label>
+      <div class="level-nav">
+        <button id="prevLevel" class="nav-btn">‹</button>
+        <span id="levelNum">1</span>
+        <button id="nextLevelNav" class="nav-btn">›</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <button id="undoBtn" class="btn btn-outline full-width">↩ Undo</button>
+      <button id="restartBtn" class="btn btn-outline full-width">↺ Restart</button>
+      <button id="solveBtn" class="btn btn-accent full-width">🤖 AI Solve</button>
+    </div>
+
+    <div class="control-group">
+      <label class="ctrl-label">Voice Control</label>
+      <button id="voiceBtn" class="btn btn-voice full-width">🎙 Start Listening</button>
+      <div id="voiceStatus" class="voice-status">Say: "Pour red into tube 2"</div>
+      <div id="voiceText" class="voice-text"></div>
+    </div>
+
+    <div class="control-group">
+      <label class="ctrl-label">Challenge Mode</label>
+      <div class="challenge-info">
+        <span>🎯 Max Moves: <strong id="maxMoves">—</strong></span>
+        <span>⏱ Time Left: <strong id="challengeTimer">—</strong></span>
+        <span>⭐ Score: <strong id="scoreDisplay">0</strong></span>
+      </div>
+      <button id="challengeToggle" class="btn btn-outline full-width">Enable Challenge</button>
+    </div>
+
+    <div class="control-group">
+      <button id="saveBtn" class="btn btn-ghost full-width">💾 Save Game</button>
+      <button id="loadBtn" class="btn btn-ghost full-width">📂 Load Game</button>
+    </div>
+  </aside>
+
+  <!-- GAME ARENA -->
+  <section class="game-arena">
+    <div id="levelTitle" class="level-title">Warm Up</div>
+    <div id="tubeContainer" class="tube-container"></div>
+    <div id="instructions" class="instructions">Click a tube to select it, then click another to pour</div>
+  </section>
+
+</main>
+
+<!-- ─── SCRIPTS ─────────────────────────────────────────────────────── -->
+<script src="animations.js"></script>
+<script src="voice_control.js"></script>
+<script src="visualizer.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
