@@ -24,9 +24,6 @@ WaterSortGame/
 │   └── visualizer.js           # Chart.js helpers
 ├── templates/
 │   └── learn.html              # Educational simulation page
-├── static/
-│   ├── sounds/                 # (add .mp3 files here)
-│   └── assets/
 ├── database/
 │   └── game.db                 # Auto-created SQLite database
 └── README.md
