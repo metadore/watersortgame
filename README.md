@@ -27,6 +27,7 @@ WaterSortGame/
 ├── database/
 │   └── game.db                 # Auto-created SQLite database
 └── README.md
+├── aquasort_docs.html
 ```
 
 ---
@@ -165,6 +166,8 @@ Color palette:
 - Font: Orbitron (headings) + Exo 2 (body)
 
 ---
+## DO CHECK OUT THE CONCEPTS,LIBRARIES USED IN THE PROJECT
+https://1drv.ms/u/c/e8f20ce819501d80/IQABmvnYOwc9R62zzqC-LRIYAdDLUb2T7tdRoqjNeh_6DKU?e=gw7H2k
 
 ## 📝 License
 
