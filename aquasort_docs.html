@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aqua Sort — Complete Beginner's Technical Documentation</title>
+<style>
+/* ── FONTS & TOKENS ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@700;900&display=swap');
+
+:root {
+  --ink:      #1a1a2e;
+  --ink-2:    #2d2d4e;
+  --ink-3:    #4a4a6a;
+  --muted:    #7a7a9a;
+  --bg:       #fafbff;
+  --bg-2:     #f0f3ff;
+  --bg-3:     #e6ebff;
+  --border:   #d0d8f0;
+  --blue:     #2563eb;
+  --blue-lt:  #dbeafe;
+  --green:    #059669;
+  --green-lt: #d1fae5;
+  --purple:   #7c3aed;
+  --purple-lt:#ede9fe;
+  --orange:   #d97706;
+  --orange-lt:#fef3c7;
+  --red:      #dc2626;
+  --red-lt:   #fee2e2;
+  --cyan:     #0891b2;
+  --cyan-lt:  #cffafe;
+  --r:        10px;
+  --r-sm:     6px;
+  --shadow:   0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+  --shadow-lg:0 4px 24px rgba(0,0,0,.12);
+}
+
+/* ── RESET ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.75;
+}
+
+/* ── LAYOUT ─────────────────────────────────────────────────── */
+.layout { display: flex; min-height: 100vh; }
+
+/* SIDEBAR NAV */
+.sidebar {
+  width: 280px; flex-shrink: 0;
+  background: white;
+  border-right: 1px solid var(--border);
+  position: sticky; top: 0; height: 100vh;
+  overflow-y: auto; padding: 2rem 0;
+}
+.sidebar-logo {
+  padding: 0 1.5rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+.sidebar-logo h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem; color: var(--blue);
+}
+.sidebar-logo p { font-size: .75rem; color: var(--muted); margin-top: .2rem; }
+
+.nav-section { margin-bottom: .5rem; }
+.nav-section-title {
+  font-size: .65rem; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted);
+  padding: .5rem 1.5rem;
+}
+.nav-link {
+  display: block; padding: .4rem 1.5rem;
+  font-size: .85rem; color: var(--ink-3);
+  text-decoration: none; border-left: 3px solid transparent;
+  transition: .15s;
+}
+.nav-link:hover { color: var(--blue); background: var(--blue-lt); border-left-color: var(--blue); }
+.nav-link.sub { padding-left: 2.5rem; font-size: .8rem; }
+
+/* MAIN CONTENT */
+.main { flex: 1; padding: 3rem 4rem; max-width: 900px; }
+
+/* ── TYPOGRAPHY ─────────────────────────────────────────────── */
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem; font-weight: 900;
+  color: var(--ink); line-height: 1.2;
+  margin-bottom: 1rem;
+}
+h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.9rem; font-weight: 700;
+  color: var(--ink); margin: 3rem 0 1rem;
+  padding-bottom: .5rem;
+  border-bottom: 2px solid var(--border);
+}
+h3 { font-size: 1.2rem; font-weight: 700; color: var(--ink-2); margin: 2rem 0 .6rem; }
+h4 { font-size: 1rem; font-weight: 600; color: var(--blue); margin: 1.5rem 0 .4rem; }
+p { color: var(--ink-3); margin-bottom: 1rem; }
+strong { color: var(--ink); font-weight: 600; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── HERO ────────────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #0891b2 100%);
+  border-radius: var(--r); padding: 3rem;
+  margin-bottom: 3rem; color: white; position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '💧';
+  position: absolute; right: 2rem; top: 50%; transform: translateY(-50%);
+  font-size: 8rem; opacity: .15;
+}
+.hero h1 { color: white; font-size: 2.2rem; margin-bottom: .5rem; }
+.hero p { color: rgba(255,255,255,.85); font-size: 1.05rem; margin-bottom: 1.5rem; }
+.hero-badges { display: flex; gap: .5rem; flex-wrap: wrap; }
+.hero-badge {
+  background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.3);
+  border-radius: 20px; padding: .3rem .8rem;
+  font-size: .75rem; font-weight: 600; color: white;
+}
+
+/* ── INFO BOXES ──────────────────────────────────────────────── */
+.box {
+  border-radius: var(--r); padding: 1.2rem 1.5rem;
+  margin: 1.2rem 0; border-left: 4px solid;
+}
+.box-blue  { background: var(--blue-lt);   border-color: var(--blue);   }
+.box-green { background: var(--green-lt);  border-color: var(--green);  }
+.box-orange{ background: var(--orange-lt); border-color: var(--orange); }
+.box-purple{ background: var(--purple-lt); border-color: var(--purple); }
+.box-red   { background: var(--red-lt);    border-color: var(--red);    }
+.box-cyan  { background: var(--cyan-lt);   border-color: var(--cyan);   }
+
+.box-label {
+  font-size: .7rem; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; margin-bottom: .3rem;
+}
+.box-blue   .box-label { color: var(--blue); }
+.box-green  .box-label { color: var(--green); }
+.box-orange .box-label { color: var(--orange); }
+.box-purple .box-label { color: var(--purple); }
+.box-red    .box-label { color: var(--red); }
+.box-cyan   .box-label { color: var(--cyan); }
+.box p { margin: 0; font-size: .9rem; }
+
+/* ── CODE BLOCKS ─────────────────────────────────────────────── */
+.code-wrap { margin: 1.2rem 0; border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); }
+.code-header {
+  background: #1e293b; color: #94a3b8;
+  padding: .5rem 1rem;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: .72rem; font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 1px;
+}
+.code-lang { color: #60a5fa; font-weight: 500; }
+pre {
+  background: #0f172a; color: #e2e8f0;
+  padding: 1.2rem 1.4rem; overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .82rem; line-height: 1.7;
+  margin: 0;
+}
+code {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-3); color: var(--purple);
+  padding: .15rem .4rem; border-radius: 4px;
+  font-size: .85em;
+}
+pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+
+/* Syntax colors */
+.kw  { color: #c792ea; }
+.fn  { color: #82aaff; }
+.str { color: #c3e88d; }
+.num { color: #f78c6c; }
+.cm  { color: #546e7a; font-style: italic; }
+.cls { color: #ffcb6b; }
+.dec { color: #ff5370; }
+
+/* ── TABLES ──────────────────────────────────────────────────── */
+.tbl-wrap { overflow-x: auto; margin: 1.2rem 0; border-radius: var(--r); box-shadow: var(--shadow); }
+table { width: 100%; border-collapse: collapse; background: white; }
+thead { background: var(--ink); color: white; }
+th { padding: .7rem 1rem; text-align: left; font-size: .82rem; font-weight: 600; letter-spacing: .5px; }
+td { padding: .65rem 1rem; font-size: .88rem; color: var(--ink-3); border-bottom: 1px solid var(--border); }
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) td { background: var(--bg-2); }
+td strong { color: var(--ink); }
+td code { font-size: .78rem; }
+
+/* ── TECH CARDS ──────────────────────────────────────────────── */
+.tech-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin: 1.2rem 0; }
+.tech-card {
+  background: white; border: 1px solid var(--border);
+  border-radius: var(--r); padding: 1.2rem;
+  box-shadow: var(--shadow); transition: .2s;
+}
+.tech-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.tech-card-icon { font-size: 1.8rem; margin-bottom: .5rem; }
+.tech-card-name { font-weight: 700; color: var(--ink); font-size: .95rem; margin-bottom: .2rem; }
+.tech-card-role { font-size: .75rem; color: var(--blue); font-weight: 600; margin-bottom: .4rem; text-transform: uppercase; letter-spacing: 1px; }
+.tech-card-desc { font-size: .82rem; color: var(--ink-3); line-height: 1.5; }
+
+/* ── FLOW DIAGRAM ────────────────────────────────────────────── */
+.flow { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 1.2rem 0; }
+.flow-box {
+  background: white; border: 2px solid var(--border);
+  border-radius: var(--r-sm); padding: .5rem 1rem;
+  font-size: .82rem; font-weight: 600; color: var(--ink-2);
+  white-space: nowrap;
+}
+.flow-box.blue   { border-color: var(--blue);   background: var(--blue-lt);   color: var(--blue); }
+.flow-box.green  { border-color: var(--green);  background: var(--green-lt);  color: var(--green); }
+.flow-box.purple { border-color: var(--purple); background: var(--purple-lt); color: var(--purple); }
+.flow-box.orange { border-color: var(--orange); background: var(--orange-lt); color: var(--orange); }
+.flow-arrow { color: var(--muted); font-size: 1.1rem; }
+
+/* ── STEPS ───────────────────────────────────────────────────── */
+.steps { margin: 1.5rem 0; }
+.step {
+  display: flex; gap: 1rem; margin-bottom: 1.5rem;
+  padding: 1.2rem; background: white;
+  border: 1px solid var(--border); border-radius: var(--r);
+  box-shadow: var(--shadow);
+}
+.step-num {
+  width: 36px; height: 36px; flex-shrink: 0;
+  background: var(--blue); color: white;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: .9rem; font-family: 'JetBrains Mono', monospace;
+}
+.step-body h4 { margin: 0 0 .3rem; color: var(--ink); }
+.step-body p  { margin: 0; font-size: .88rem; }
+
+/* ── FILE TREE ───────────────────────────────────────────────── */
+.file-tree {
+  background: #0f172a; border-radius: var(--r);
+  padding: 1.5rem; font-family: 'JetBrains Mono', monospace;
+  font-size: .82rem; line-height: 2; box-shadow: var(--shadow);
+  margin: 1.2rem 0;
+}
+.ft-folder { color: #fbbf24; }
+.ft-file   { color: #94a3b8; }
+.ft-comment{ color: #475569; font-style: italic; }
+.ft-indent { padding-left: 1.5rem; display: block; }
+
+/* ── SECTION DIVIDER ─────────────────────────────────────────── */
+.section-divider {
+  height: 1px; background: linear-gradient(90deg, var(--blue), var(--purple), transparent);
+  margin: 3rem 0;
+}
+
+/* ── CHAPTER HEADER ──────────────────────────────────────────── */
+.chapter-header {
+  background: linear-gradient(135deg, var(--blue-lt), var(--purple-lt));
+  border-radius: var(--r); padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem; border-left: 5px solid var(--blue);
+}
+.chapter-num {
+  font-size: .7rem; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--blue); margin-bottom: .3rem;
+}
+.chapter-header h2 { margin: 0; padding: 0; border: none; font-size: 1.6rem; }
+.chapter-header p  { margin: .3rem 0 0; color: var(--ink-3); font-size: .9rem; }
+
+/* ── PRINT ───────────────────────────────────────────────────── */
+@media print {
+  .sidebar { display: none; }
+  .main { padding: 1rem; max-width: 100%; }
+  .hero { background: #1e3a8a !important; -webkit-print-color-adjust: exact; }
+}
+
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { padding: 2rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ── SIDEBAR ──────────────────────────────────────────────── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h2>💧 Aqua Sort Docs</h2>
+    <p>Complete Beginner's Guide</p>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Introduction</div>
+    <a href="#overview" class="nav-link">Project Overview</a>
+    <a href="#tech-stack" class="nav-link">Tech Stack Summary</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Frontend</div>
+    <a href="#html" class="nav-link">HTML</a>
+    <a href="#css" class="nav-link">CSS</a>
+    <a href="#javascript" class="nav-link">JavaScript</a>
+    <a href="#animations" class="nav-link sub">→ Animations</a>
+    <a href="#voice" class="nav-link sub">→ Voice Control</a>
+    <a href="#charts" class="nav-link sub">→ Chart.js</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Backend</div>
+    <a href="#flask" class="nav-link">Flask (Python)</a>
+    <a href="#game-engine" class="nav-link">Game Engine</a>
+    <a href="#ai-solver" class="nav-link">AI Solver</a>
+    <a href="#difficulty" class="nav-link">Difficulty System</a>
+    <a href="#analytics" class="nav-link">Analytics</a>
+    <a href="#sqlite" class="nav-link">SQLite Database</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Deployment</div>
+    <a href="#git" class="nav-link">Git & GitHub</a>
+    <a href="#render" class="nav-link">Render (Backend)</a>
+    <a href="#vercel" class="nav-link">Vercel (Frontend)</a>
+    <a href="#how-it-connects" class="nav-link">How It All Connects</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Reference</div>
+    <a href="#api-reference" class="nav-link">API Endpoints</a>
+    <a href="#file-structure" class="nav-link">File Structure</a>
+    <a href="#glossary" class="nav-link">Glossary</a>
+  </div>
+</nav>
+
+<!-- ── MAIN CONTENT ─────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>💧 Aqua Sort — Complete Technical Documentation</h1>
+    <p>A beginner-friendly explanation of every technology, every file, and every decision made while building and deploying the Water Sort Puzzle Game.</p>
+    <div class="hero-badges">
+      <span class="hero-badge">Python + Flask</span>
+      <span class="hero-badge">Vanilla JavaScript</span>
+      <span class="hero-badge">SQLite</span>
+      <span class="hero-badge">BFS / A* AI</span>
+      <span class="hero-badge">Web Speech API</span>
+      <span class="hero-badge">Chart.js</span>
+      <span class="hero-badge">GitHub</span>
+      <span class="hero-badge">Render</span>
+      <span class="hero-badge">Vercel</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="overview">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 01</div>
+    <h2>Project Overview</h2>
+    <p>What is Aqua Sort and how does it work at a high level?</p>
+  </div>
+
+  <p>Aqua Sort is a <strong>full-stack web application</strong> — meaning it has two parts that work together: a <strong>frontend</strong> (what the user sees in the browser) and a <strong>backend</strong> (a server running Python that handles the game logic).</p>
+
+  <div class="box box-blue">
+    <div class="box-label">🧠 Key Concept — Full Stack</div>
+    <p><strong>Frontend</strong> = HTML, CSS, JavaScript running in your browser. It draws the game and reacts to clicks. <strong>Backend</strong> = Python server running somewhere else. It validates moves, runs the AI, stores data. They talk to each other using a <strong>REST API</strong> — basically sending JSON messages back and forth over the internet.</p>
+  </div>
+
+  <h3>How a single game move works end-to-end</h3>
+  <div class="flow">
+    <div class="flow-box blue">👆 Player Clicks Tube</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">JavaScript handles click</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box purple">POST /api/move sent</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">Flask receives it</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">GameEngine validates</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box green">JSON response back</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box blue">DOM re-renders tubes</div>
+  </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="tech-stack">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 02</div>
+    <h2>Tech Stack — Everything Used</h2>
+    <p>Every single technology used in this project and exactly why it was chosen.</p>
+  </div>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-card-icon">🐍</div>
+      <div class="tech-card-name">Python 3.11</div>
+      <div class="tech-card-role">Backend Language</div>
+      <div class="tech-card-desc">The programming language used to write all the server-side logic. Python is beginner-friendly, widely used, and has great libraries for web servers.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🌶️</div>
+      <div class="tech-card-name">Flask</div>
+      <div class="tech-card-role">Web Framework</div>
+      <div class="tech-card-desc">A lightweight Python library that turns your Python code into a web server. It listens for HTTP requests and sends back responses.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🗄️</div>
+      <div class="tech-card-name">SQLite</div>
+      <div class="tech-card-role">Database</div>
+      <div class="tech-card-desc">A file-based database that stores game saves and analytics. No setup needed — it creates a single .db file automatically.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">📄</div>
+      <div class="tech-card-name">HTML5</div>
+      <div class="tech-card-role">Page Structure</div>
+      <div class="tech-card-desc">The skeleton of every web page. Defines what elements exist — buttons, divs, headers, overlays — without any styling.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🎨</div>
+      <div class="tech-card-name">CSS3</div>
+      <div class="tech-card-role">Styling & Animations</div>
+      <div class="tech-card-desc">Controls how everything looks — colors, gradients, layout, animations, dark mode, responsive design. All the visual magic lives here.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">⚡</div>
+      <div class="tech-card-name">JavaScript (ES6+)</div>
+      <div class="tech-card-role">Frontend Logic</div>
+      <div class="tech-card-desc">Makes the page interactive. Handles clicks, talks to the backend via fetch(), updates the DOM when data changes.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">📊</div>
+      <div class="tech-card-name">Chart.js</div>
+      <div class="tech-card-role">Data Visualization</div>
+      <div class="tech-card-desc">A JavaScript library that draws beautiful charts (line, bar, doughnut) from data. Used for the analytics dashboard.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🎙️</div>
+      <div class="tech-card-name">Web Speech API</div>
+      <div class="tech-card-role">Voice Control</div>
+      <div class="tech-card-desc">A built-in browser API (no library needed) that converts your voice to text. Used for the voice command feature.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🐙</div>
+      <div class="tech-card-name">Git & GitHub</div>
+      <div class="tech-card-role">Version Control</div>
+      <div class="tech-card-desc">Git tracks every change to your code. GitHub stores your code online so deployment platforms can access it.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🟢</div>
+      <div class="tech-card-name">Render</div>
+      <div class="tech-card-role">Backend Hosting</div>
+      <div class="tech-card-desc">A cloud platform that runs your Python Flask server 24/7 so anyone in the world can reach your API.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">▲</div>
+      <div class="tech-card-name">Vercel</div>
+      <div class="tech-card-role">Frontend Hosting</div>
+      <div class="tech-card-desc">A platform that serves your HTML/CSS/JS files globally using a CDN — so your game loads fast anywhere in the world.</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🦄</div>
+      <div class="tech-card-name">Gunicorn</div>
+      <div class="tech-card-role">Production Server</div>
+      <div class="tech-card-desc">Flask's built-in server is only for development. Gunicorn is a production-grade server that handles many users at once.</div>
+    </div>
+  </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="html">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 03</div>
+    <h2>Frontend — HTML</h2>
+    <p>The skeleton of the game interface.</p>
+  </div>
+
+  <p><strong>File:</strong> <code>frontend/index.html</code></p>
+
+  <div class="box box-blue">
+    <div class="box-label">📖 What is HTML?</div>
+    <p>HTML (HyperText Markup Language) is the language used to define the structure of a web page. It uses <strong>tags</strong> like <code>&lt;div&gt;</code>, <code>&lt;button&gt;</code>, and <code>&lt;h1&gt;</code> to describe elements. The browser reads these tags and draws the page.</p>
+  </div>
+
+  <h3>What the HTML file contains</h3>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Section</th><th>HTML Element</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Header bar</strong></td><td><code>&lt;header class="hdr"&gt;</code></td><td>Logo, nav links, level badge, timer, dark mode toggle</td></tr>
+      <tr><td><strong>Notification</strong></td><td><code>&lt;div id="notification"&gt;</code></td><td>Pop-up messages ("Invalid move", "Level complete")</td></tr>
+      <tr><td><strong>Win overlay</strong></td><td><code>&lt;div id="winOverlay"&gt;</code></td><td>Shown when player wins — hidden by default</td></tr>
+      <tr><td><strong>Analytics overlay</strong></td><td><code>&lt;div id="analyticsOverlay"&gt;</code></td><td>Dashboard with charts — hidden by default</td></tr>
+      <tr><td><strong>Solution overlay</strong></td><td><code>&lt;div id="solutionOverlay"&gt;</code></td><td>AI solver steps — hidden by default</td></tr>
+      <tr><td><strong>Sidebar</strong></td><td><code>&lt;aside class="sidebar"&gt;</code></td><td>Level nav, undo/restart buttons, voice control, save/load</td></tr>
+      <tr><td><strong>Game arena</strong></td><td><code>&lt;section class="game-arena"&gt;</code></td><td>Where the tubes are rendered dynamically by JavaScript</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Key HTML concepts used</h3>
+
+  <h4>Data attributes</h4>
+  <p>Used to store custom data on HTML elements that JavaScript can read:</p>
+  <div class="code-wrap">
+    <div class="code-header"><span>HTML</span><span class="code-lang">index.html</span></div>
+    <pre><span class="cm">&lt;!-- data-index lets JavaScript know which tube was clicked --&gt;</span>
+&lt;div class=<span class="str">"tube-wrap"</span> data-index=<span class="str">"2"</span>&gt;...&lt;/div&gt;
+
+<span class="cm">&lt;!-- JavaScript reads it like this: --&gt;</span>
+wrap.dataset.index  <span class="cm">// returns "2"</span></pre>
+  </div>
+
+  <h4>Semantic HTML</h4>
+  <p>Using meaningful tags instead of just <code>&lt;div&gt;</code> everywhere — <code>&lt;header&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;aside&gt;</code>, <code>&lt;section&gt;</code>. This helps screen readers and search engines understand the page.</p>
+
+  <h4>Google Fonts link</h4>
+  <div class="code-wrap">
+    <div class="code-header"><span>HTML</span><span class="code-lang">index.html &lt;head&gt;</span></div>
+    <pre>&lt;link href=<span class="str">"https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"</span> rel=<span class="str">"stylesheet"</span>&gt;</pre>
+  </div>
+  <p>This loads two fonts from Google's servers: <strong>Orbitron</strong> (futuristic headings) and <strong>Exo 2</strong> (body text). The browser downloads them automatically when the page loads.</p>
+
+  <h4>Script loading order</h4>
+  <div class="code-wrap">
+    <div class="code-header"><span>HTML</span><span class="code-lang">Bottom of index.html</span></div>
+    <pre><span class="cm">&lt;!-- Scripts load in this order — order matters! --&gt;</span>
+&lt;script src=<span class="str">"animations.js"</span>&gt;&lt;/script&gt;    <span class="cm">&lt;!-- loaded first —  app.js uses it --&gt;</span>
+&lt;script src=<span class="str">"voice_control.js"</span>&gt;&lt;/script&gt; <span class="cm">&lt;!-- loaded second --&gt;</span>
+&lt;script src=<span class="str">"visualizer.js"</span>&gt;&lt;/script&gt;   <span class="cm">&lt;!-- loaded third --&gt;</span>
+&lt;script src=<span class="str">"app.js"</span>&gt;&lt;/script&gt;         <span class="cm">&lt;!-- loaded last — uses everything above --&gt;</span></pre>
+  </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="css">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 04</div>
+    <h2>Frontend — CSS</h2>
+    <p>All the visual styling, animations, and responsive design.</p>
+  </div>
+
+  <p><strong>File:</strong> <code>frontend/styles.css</code></p>
+
+  <div class="box box-blue">
+    <div class="box-label">📖 What is CSS?</div>
+    <p>CSS (Cascading Style Sheets) controls how HTML elements look — colors, sizes, spacing, animations, layout. Without CSS, the page would be plain black text on a white background.</p>
+  </div>
+
+  <h3>CSS Custom Properties (Variables)</h3>
+  <p>Instead of hardcoding colors everywhere, the project uses CSS variables so you can change the whole theme in one place:</p>
+  <div class="code-wrap">
+    <div class="code-header"><span>CSS</span><span class="code-lang">styles.css</span></div>
+    <pre>:root {
+  --bg-0:    #050810;   <span class="cm">/* deepest background */</span>
+  --accent:  #00d4ff;   <span class="cm">/* cyan glow color */</span>
+  --accent-2:#7b2fff;   <span class="cm">/* purple highlight */</span>
+  --text-1:  #e8f0ff;   <span class="cm">/* primary text */</span>
+}
+
+<span class="cm">/* Used anywhere like: */</span>
+.logo { color: var(--accent); }</pre>
+  </div>
+
+  <h3>Dark / Light Mode</h3>
+  <p>The dark/light toggle works by switching a <code>data-theme</code> attribute on <code>&lt;body&gt;</code>, which changes which CSS variable values are active:</p>
+  <div class="code-wrap">
+    <div class="code-header"><span>CSS</span><span class="code-lang">styles.css</span></div>
+    <pre><span class="cm">/* Default = dark theme (defined in :root) */</span>
+:root { --bg-0: #050810; --text-1: #e8f0ff; }
+
+<span class="cm">/* Light theme overrides same variables */</span>
+[data-theme="light"] {
+  --bg-0:   #e8f0ff;   <span class="cm">/* now bg is light */</span>
+  --text-1: #0a0f2a;   <span class="cm">/* now text is dark */</span>
+}</pre>
+  </div>
+
+  <h3>CSS Flexbox & Grid</h3>
+  <p>Two modern layout systems used throughout the project:</p>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Property</th><th>Where Used</th><th>What It Does</th></tr></thead>
+    <tbody>
+      <tr><td><code>display: grid</code></td><td>Main layout, analytics grid</td><td>Creates a 2-column layout (sidebar + game area)</td></tr>
+      <tr><td><code>display: flex</code></td><td>Header, tubes, buttons</td><td>Arranges items in a row or column with easy alignment</td></tr>
+      <tr><td><code>flex-wrap: wrap</code></td><td>Tube container</td><td>Tubes wrap to next line if too many to fit in one row</td></tr>
+      <tr><td><code>align-items: flex-end</code></td><td>Tube container</td><td>Taller tubes align to the bottom edge</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Gradient Liquid Layers</h3>
+  <p>Each color of liquid is defined as a CSS class with a <code>linear-gradient</code> background:</p>
+  <div class="code-wrap">
+    <div class="code-header"><span>CSS</span><span class="code-lang">styles.css</span></div>
+    <pre><span class="cm">/* Each color has a gradient from one shade to another */</span>
+.layer-red    { background: linear-gradient(180deg, #ff4e50, #fc466b); }
+.layer-blue   { background: linear-gradient(180deg, #2980b9, #6dd5fa); }
+.layer-green  { background: linear-gradient(180deg, #11998e, #38ef7d); }
+.layer-yellow { background: linear-gradient(180deg, #f7971e, #ffd200); }
+
+<span class="cm">/* JavaScript adds these classes dynamically when rendering tubes */</span></pre>
+  </div>
+
+  <h3>CSS Animations</h3>
+  <p>Pure CSS animations used in the project:</p>
+  <div class="code-wrap">
+    <div class="code-header"><span>CSS</span><span class="code-lang">styles.css</span></div>
+    <pre><span class="cm">/* The floating water drop in the logo */</span>
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-5px); }
+}
+.logo-drop { animation: float 3s ease-in-out infinite; }
+
+<span class="cm">/* Background grid slowly drifts */</span>
+@keyframes bgShift { to { background-position: 40px 40px; } }
+
+<span class="cm">/* Shimmer effect on liquid layers */</span>
+@keyframes shimmer {
+  0%   { left: -60%; }
+  100% { left: 120%; }
+}
+.liquid-layer::before { animation: shimmer 2.5s ease-in-out infinite; }</pre>
+  </div>
+
+  <h3>Responsive Design</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span>CSS</span><span class="code-lang">styles.css</span></div>
+    <pre><span class="cm">/* On mobile (screens under 800px wide), stack layout vertically */</span>
+@media (max-width: 800px) {
+  .main-layout { grid-template-columns: 1fr; } <span class="cm">/* 1 column instead of 2 */</span>
+  .sidebar { flex-direction: row; flex-wrap: wrap; } <span class="cm">/* sidebar becomes horizontal */</span>
+}</pre>
+  </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="javascript">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 05</div>
+    <h2>Frontend — JavaScript</h2>
+    <p>The brain of the frontend — handles clicks, API calls, and DOM updates.</p>
+  </div>
+
+  <p><strong>File:</strong> <code>frontend/app.js</code></p>
+
+  <div class="box box-blue">
+    <div class="box-label">📖 What is JavaScript?</div>
+    <p>JavaScript is the only programming language that runs inside a web browser. It makes pages interactive — responding to clicks, fetching data from servers, and updating what you see without reloading the page.</p>
+  </div>
+
+  <h3>State Management</h3>
+  <p>All game state is kept in a single <code>State</code> object in memory:</p>
+  <div class="code-wrap">
+    <div class="code-header"><span>JavaScript</span><span class="code-lang">app.js</span></div>
+    <pre><span class="kw">const</span> State = {
+  sessionId:    <span class="kw">null</span>,    <span class="cm">// unique ID to identify this player's session</span>
+  currentLevel: <span class="num">1</span>,       <span class="cm">// which level is active</span>
+  tubes:        [],       <span class="cm">// array of tube objects from backend</span>
+  selectedTube: <span class="kw">null</span>,    <span class="cm">// which tube player clicked first</span>
+  moveCount:    <span class="num">0</span>,       <span class="cm">// how many moves taken</span>
+  isWon:        <span class="kw">false</span>,   <span class="cm">// has the level been solved?</span>
+  elapsed:      <span class="num">0</span>,       <span class="cm">// seconds since level started</span>
+};</pre>
+  </div>
+
+  <h3>API Calls with fetch()</h3>
+  <p>JavaScript uses the built-in <code>fetch()</code> function to talk to the Flask backend:</p>
+  <div class="code-wrap">
+    <div class="code-header"><span>JavaScript</span><span class="code-lang">app.js</span></div>
+    <pre><span class="cm">// All API calls go through this helper function</span>
+<span class="kw">async function</span> <span class="fn">apiFetch</span>(endpoint, method = <span class="str">"GET"</span>, body = <span class="kw">null</span>) {
+  <span class="kw">const</span> opts = { method, headers: { <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span> } };
+  <span class="kw">if</span> (body) opts.body = JSON.<span class="fn">stringify</span>(body);  <span class="cm">// convert JS object to JSON text</span>
+
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(`${API_BASE}${endpoint}`, opts);
+  <span class="kw">return await</span> res.<span class="fn">json</span>();  <span class="cm">// parse JSON text back to JS object</span>
+}
+
+<span class="cm">// Example: making a move</span>
+<span class="kw">const</span> data = <span class="kw">await</span> <span class="fn">apiFetch</span>(<span class="str">"/move"</span>, <span class="str">"POST"</span>, {
+  session_id: State.sessionId,
+  from_tube: <span class="num">0</span>,
+  to_tube: <span class="num">2</span>
+});</pre>
+  </div>
+
+  <div class="box box-orange">
+    <div class="box-label">💡 What is async/await?</div>
+    <p>API calls take time (the request travels to the server and back). <code>async/await</code> pauses the function until the response arrives, instead of blocking the entire browser. It makes asynchronous code look like synchronous code.</p>
+  </div>
+
+  <h3>DOM Manipulation — Rendering Tubes</h3>
+  <p>JavaScript dynamically creates HTML elements for each tube:</p>
+  <div class="code-wrap">
+    <div class="code-header"><span>JavaScript</span><span class="code-lang">app.js</span></div>
+    <pre><span class="kw">function</span> <span class="fn">renderTubes</span>(tubes) {
+  <span class="kw">const</span> container = document.<span class="fn">getElementById</span>(<span class="str">"tubeContainer"</span>);
+  container.innerHTML = <span class="str">""</span>;  <span class="cm">// clear old tubes</span>
+
+  tubes.<span class="fn">forEach</span>((tube, idx) => {
+    <span class="kw">const</span> wrap = document.<span class="fn">createElement</span>(<span class="str">"div"</span>);   <span class="cm">// create &lt;div&gt;</span>
+    wrap.className = <span class="str">"tube-wrap"</span>;                 <span class="cm">// add CSS class</span>
+    wrap.dataset.index = idx;                       <span class="cm">// store index</span>
+
+    <span class="cm">// Create one div per liquid layer</span>
+    tube.layers.<span class="fn">forEach</span>((color) => {
+      <span class="kw">const</span> layer = document.<span class="fn">createElement</span>(<span class="str">"div"</span>);
+      layer.className = `liquid-layer layer-${color}`; <span class="cm">// e.g. "layer-red"</span>
+      layer.style.height = `${layerH}px`;
+      tubeEl.<span class="fn">appendChild</span>(layer);
+    });
+
+    wrap.<span class="fn">addEventListener</span>(<span class="str">"click"</span>, () => <span class="fn">onTubeClick</span>(idx));
+    container.<span class="fn">appendChild</span>(wrap);
+  });
+}</pre>
+  </div>
+
+  <h3>localStorage — Persisting Preferences</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span>JavaScript</span><span class="code-lang">app.js</span></div>
+    <pre><span class="cm">// Save dark/light preference so it survives page refresh</span>
+localStorage.<span class="fn">setItem</span>(<span class="str">"aqua_theme"</span>, <span class="str">"dark"</span>);
+
+<span class="cm">// Read it back on page load</span>
+<span class="kw">const</span> saved = localStorage.<span class="fn">getItem</span>(<span class="str">"aqua_theme"</span>) || <span class="str">"dark"</span>;
+document.body.dataset.theme = saved;</pre>
+  </div>
+
+  <h3>Timer Implementation</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span>JavaScript</span><span class="code-lang">app.js</span></div>
+    <pre><span class="kw">function</span> <span class="fn">startTimer</span>() {
+  State.startTime = Date.<span class="fn">now</span>();   <span class="cm">// record start timestamp in milliseconds</span>
+  State.timerInterval = <span class="fn">setInterval</span>(() => {
+    <span class="cm">// Every 1000ms (1 second), recalculate elapsed time</span>
+    State.elapsed = Math.<span class="fn">floor</span>((Date.<span class="fn">now</span>() - State.startTime) / <span class="num">1000</span>);
+    document.<span class="fn">getElementById</span>(<span class="str">"timerBadge"</span>).textContent = <span class="fn">formatTime</span>(State.elapsed);
+  }, <span class="num">1000</span>);
+}</pre>
+  </div>
+  </div>
+
+  <!-- ─── Animations ─────────────────────────────────────── -->
+  <div id="animations">
+  <h3>Animations Module</h3>
+  <p><strong>File:</strong> <code>frontend/animations.js</code></p>
+  <p>All visual effects are separated into their own module to keep code clean:</p>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Function</th><th>What It Does</th><th>How It Works</th></tr></thead>
+    <tbody>
+      <tr><td><code>pourEffect(src, dst)</code></td><td>Arc particles fly from source to destination tube</td><td>Creates <code>&lt;div&gt;</code> elements, positions them at source tube, animates them along a curved path using Web Animations API</td></tr>
+      <tr><td><code>shakeEffect(idx)</code></td><td>Tube shakes left-right on invalid move</td><td>Uses <code>element.animate()</code> with keyframes that move X position: 0 → -8px → 8px → 0</td></tr>
+      <tr><td><code>winCelebration()</code></td><td>80 colourful confetti pieces fall down the screen</td><td>Creates divs with random positions, colors, sizes — animates them falling with CSS transforms</td></tr>
+      <tr><td><code>rippleEffect(wrap)</code></td><td>Expanding circle at destination tube</td><td>Absolutely-positioned div that scales from 1x to 5x while fading out</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="code-wrap">
+    <div class="code-header"><span>JavaScript</span><span class="code-lang">animations.js — Web Animations API</span></div>
+    <pre><span class="cm">// The shake animation using keyframes</span>
+wrap.<span class="fn">animate</span>([
+  { transform: <span class="str">"translateX(0)"</span>   },
+  { transform: <span class="str">"translateX(-8px)"</span> },
+  { transform: <span class="str">"translateX(8px)"</span>  },
+  { transform: <span class="str">"translateX(0)"</span>   },
+], { duration: <span class="num">320</span>, easing: <span class="str">"ease-out"</span> });</pre>
+  </div>
+  </div>
+
+  <!-- ─── Voice ──────────────────────────────────────────── -->
+  <div id="voice">
+  <h3>Voice Control Module</h3>
+  <p><strong>File:</strong> <code>frontend/voice_control.js</code></p>
+
+  <div class="box box-purple">
+    <div class="box-label">📖 What is the Web Speech API?</div>
+    <p>A built-in browser feature (no external library needed) that listens to your microphone and converts spoken words to text. It's available in Chrome and Edge. The result — a plain text string — is then sent to the Flask backend to be parsed into a game action.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><span>JavaScript</span><span class="code-lang">voice_control.js</span></div>
+    <pre><span class="cm">// Create a speech recognition instance</span>
+<span class="kw">const</span> SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+recognition = <span class="kw">new</span> SR();
+recognition.lang = <span class="str">"en-US"</span>;
+
+<span class="cm">// When speech is detected:</span>
+recognition.onresult = <span class="kw">async</span> (e) => {
+  <span class="kw">const</span> transcript = e.results[<span class="num">0</span>][<span class="num">0</span>].transcript;  <span class="cm">// e.g. "pour red into tube 2"</span>
+  <span class="cm">// Send to backend to parse into an action</span>
+  <span class="kw">await</span> <span class="fn">handleVoiceCommand</span>(transcript, statusEl);
+};</pre>
+  </div>
+  </div>
+
+  <!-- ─── Chart.js ──────────────────────────────────────── -->
+  <div id="charts">
+  <h3>Chart.js — Analytics Charts</h3>
+  <p><strong>File:</strong> <code>frontend/visualizer.js</code> + <code>app.js</code></p>
+
+  <div class="box box-blue">
+    <div class="box-label">📖 What is Chart.js?</div>
+    <p>Chart.js is a free JavaScript library that draws charts on a <code>&lt;canvas&gt;</code> HTML element. You give it data and configuration, and it handles all the drawing. It's loaded from a CDN (Content Delivery Network) so no installation is needed.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><span>JavaScript</span><span class="code-lang">app.js — Creating a line chart</span></div>
+    <pre><span class="cm">// Chart.js creates charts on &lt;canvas&gt; elements</span>
+State.movesChart = <span class="kw">new</span> Chart(document.<span class="fn">getElementById</span>(<span class="str">"movesChart"</span>), {
+  type: <span class="str">"line"</span>,            <span class="cm">// line chart</span>
+  data: {
+    labels: [<span class="str">"S1"</span>, <span class="str">"S2"</span>, <span class="str">"S3"</span>],         <span class="cm">// X axis labels</span>
+    datasets: [{
+      label: <span class="str">"Moves"</span>,
+      data: [<span class="num">12</span>, <span class="num">8</span>, <span class="num">15</span>],              <span class="cm">// Y axis values</span>
+      borderColor: <span class="str">"#00d4ff"</span>,
+      fill: <span class="kw">true</span>,
+    }]
+  },
+  options: { responsive: <span class="kw">true</span> }
+});</pre>
+  </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="flask">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 06</div>
+    <h2>Backend — Flask (Python)</h2>
+    <p>The web server that handles all game logic, data, and API requests.</p>
+  </div>
+
+  <p><strong>File:</strong> <code>backend/app.py</code></p>
+
+  <div class="box box-green">
+    <div class="box-label">📖 What is Flask?</div>
+    <p>Flask is a Python library that lets you create a web server in just a few lines. You define <strong>routes</strong> (URL paths like <code>/api/move</code>) and <strong>functions</strong> that run when someone visits those URLs. It listens for HTTP requests and sends back HTTP responses — usually JSON data.</p>
+  </div>
+
+  <h3>How a Flask route works</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span>Python</span><span class="code-lang">app.py</span></div>
+    <pre><span class="cm"># The @app.route decorator tells Flask "when someone calls POST /api/move,</span>
+<span class="cm"># run the make_move() function"</span>
+<span class="cls">@app</span>.<span class="fn">route</span>(<span class="str">"/api/move"</span>, methods=[<span class="str">"POST"</span>])
+<span class="kw">def</span> <span class="fn">make_move</span>():
+    data = request.<span class="fn">get_json</span>()     <span class="cm"># read JSON from the request body</span>
+    session_id = data[<span class="str">"session_id"</span>]
+    src = data[<span class="str">"from_tube"</span>]
+    dst = data[<span class="str">"to_tube"</span>]
+
+    engine = sessions[session_id][<span class="str">"engine"</span>]
+    success, reason, moved = engine.<span class="fn">pour</span>(src, dst)
+
+    <span class="kw">return</span> <span class="fn">jsonify</span>({               <span class="cm"># send JSON response back</span>
+        <span class="str">"success"</span>: success,
+        <span class="str">"reason"</span>: reason,
+        <span class="str">"move_count"</span>: engine.move_count,
+        <span class="str">"is_won"</span>: engine.<span class="fn">is_won</span>(),
+    })</pre>
+  </div>
+
+  <h3>CORS — Cross-Origin Resource Sharing</h3>
+  <div class="box box-orange">
+    <div class="box-label">💡 What is CORS?</div>
+    <p>Browsers block JavaScript from making requests to a different domain by default (security feature). Since your frontend is on <code>vercel.app</code> but backend is on <code>onrender.com</code>, Flask needs to explicitly allow requests from Vercel. The <code>flask-cors</code> library adds the required HTTP headers to tell browsers "this is allowed".</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><span>Python</span><span class="code-lang">app.py</span></div>
+    <pre><span class="kw">from</span> flask_cors <span class="kw">import</span> CORS
+
+<span class="cm"># Allow requests from these origins only</span>
+<span class="fn">CORS</span>(app, origins=[
+    <span class="str">"http://localhost:5000"</span>,
+    <span class="str">"https://watersortgame.vercel.app"</span>,
+    <span class="str">"https://*.vercel.app"</span>,
+])</pre>
+  </div>
+
+  <h3>Session Management</h3>
+  <p>Each player gets a unique <code>session_id</code> (UUID). The server stores all active game states in a Python dictionary in memory:</p>
+  <div class="code-wrap">
+    <div class="code-header"><span>Python</span><span class="code-lang">app.py</span></div>
+    <pre><span class="cm"># In-memory dictionary: session_id → game state</span>
+sessions = {}
+
+<span class="cm"># When a new level starts:</span>
+sessions[session_id] = {
+    <span class="str">"engine"</span>:     engine,      <span class="cm"># the GameEngine object</span>
+    <span class="str">"level"</span>:      level,       <span class="cm"># current level number</span>
+    <span class="str">"start_time"</span>: time.<span class="fn">time</span>(), <span class="cm"># when level began (for analytics)</span>
+}</pre>
+  </div>
+
+  <h3>Voice Command Parser</h3>
+  <p>Uses Python's <code>re</code> (regular expressions) module to extract meaning from spoken text:</p>
+  <div class="code-wrap">
+    <div class="code-header"><span>Python</span><span class="code-lang">app.py</span></div>
+    <pre><span class="kw">import</span> re
+
+<span class="kw">def</span> <span class="fn">parse_voice_command</span>(text):
+    t = text.<span class="fn">lower</span>().<span class="fn">strip</span>()
+
+    <span class="cm"># Check for "undo" anywhere in the text</span>
+    <span class="kw">if</span> re.<span class="fn">search</span>(<span class="str">r"\bundo\b"</span>, t):
+        <span class="kw">return</span> {<span class="str">"action"</span>: <span class="str">"undo"</span>}
+
+    <span class="cm"># Match "pour red into tube 2" pattern</span>
+    match = re.<span class="fn">search</span>(<span class="str">r"pour\s+(\w+)\s+(?:into|to)\s+tube\s+(\w+)"</span>, t)
+    <span class="kw">if</span> match:
+        color = match.<span class="fn">group</span>(<span class="num">1</span>)   <span class="cm"># "red"</span>
+        tube  = match.<span class="fn">group</span>(<span class="num">2</span>)   <span class="cm"># "2"</span>
+        <span class="kw">return</span> {<span class="str">"action"</span>: <span class="str">"pour_color"</span>, <span class="str">"color"</span>: color, <span class="str">"to_tube"</span>: tube}</pre>
+  </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="game-engine">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 07</div>
+    <h2>Backend — Game Engine</h2>
+    <p>The pure Python logic that makes the game work.</p>
+  </div>
+
+  <p><strong>File:</strong> <code>backend/game_engine.py</code></p>
+
+  <h3>The Tube Class</h3>
+  <p>Represents a single tube. It stores liquid layers as a Python list (index 0 = bottom):</p>
+  <div class="code-wrap">
+    <div class="code-header"><span>Python</span><span class="code-lang">game_engine.py</span></div>
+    <pre><span class="kw">class</span> <span class="cls">Tube</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, capacity=<span class="num">4</span>):
+        self.capacity = capacity
+        self.layers = []   <span class="cm"># e.g. ["red", "blue", "red"] — bottom to top</span>
+
+    <span class="kw">def</span> <span class="fn">top_color</span>(self):
+        <span class="kw">return</span> self.layers[-<span class="num">1</span>] <span class="kw">if</span> self.layers <span class="kw">else None</span>
+
+    <span class="kw">def</span> <span class="fn">is_complete</span>(self):
+        <span class="cm"># Full AND all layers same color</span>
+        <span class="kw">return</span> self.<span class="fn">is_full</span>() <span class="kw">and</span> <span class="fn">len</span>(<span class="fn">set</span>(self.layers)) == <span class="num">1</span>
+
+    <span class="kw">def</span> <span class="fn">top_count</span>(self):
+        <span class="cm"># How many consecutive same-color layers at the top</span>
+        color = self.<span class="fn">top_color</span>()
+        <span class="kw">return</span> <span class="fn">sum</span>(<span class="num">1</span> <span class="kw">for</span> l <span class="kw">in</span> <span class="fn">reversed</span>(self.layers) <span class="kw">if</span> l == color)</pre>
+  </div>
+
+  <h3>Move Validation Rules</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Rule</th><th>Code Check</th><th>Why?</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Can't pour from same tube</td><td><code>src == dst</code></td><td>Would do nothing</td></tr>
+      <tr><td>2</td><td>Source must not be empty</td><td><code>s.is_empty()</code></td><td>Nothing to pour</td></tr>
+      <tr><td>3</td><td>Destination must not be full</td><td><code>d.is_full()</code></td><td>No space to receive</td></tr>
+      <tr><td>4</td><td>Colors must match (or dst empty)</td><td><code>s.top_color() != d.top_color()</code></td><td>Game rule</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Undo Stack</h3>
+  <p>Before every move, a complete snapshot of all tube states is saved. Undo just pops the last snapshot:</p>
+  <div class="code-wrap">
+    <div class="code-header"><span>Python</span><span class="code-lang">game_engine.py</span></div>
+    <pre><span class="kw">def</span> <span class="fn">pour</span>(self, src, dst):
+    <span class="cm"># Save snapshot BEFORE making the move</span>
+    self.undo_stack.<span class="fn">append</span>(self.<span class="fn">snapshot</span>())
+
+    <span class="cm"># Make the move...</span>
+    color = self.tubes[src].<span class="fn">top_color</span>()
+    layers_to_move = <span class="fn">min</span>(s.<span class="fn">top_count</span>(), d.<span class="fn">free_space</span>())
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(layers_to_move):
+        self.tubes[src].layers.<span class="fn">pop</span>()      <span class="cm"># remove from source</span>
+        self.tubes[dst].layers.<span class="fn">append</span>(color) <span class="cm"># add to destination</span>
+
+<span class="kw">def</span> <span class="fn">undo</span>(self):
+    <span class="kw">if not</span> self.undo_stack: <span class="kw">return False</span>
+    snap = self.undo_stack.<span class="fn">pop</span>()   <span class="cm"># get last snapshot</span>
+    self.<span class="fn">restore</span>(snap)              <span class="cm"># restore tube states</span>
+    <span class="kw">return True</span></pre>
+  </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="ai-solver">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 08</div>
+    <h2>Backend — AI Solver</h2>
+    <p>How the computer automatically solves any puzzle.</p>
+  </div>
+
+  <p><strong>File:</strong> <code>backend/ai_solver.py</code></p>
+
+  <h3>BFS — Breadth-First Search</h3>
+  <div class="box box-purple">
+    <div class="box-label">📖 What is BFS?</div>
+    <p>Imagine exploring a maze. BFS tries every possible move from the start, then every move from those positions, then the next level, and so on — like ripples in water. It guarantees finding the <strong>shortest possible solution</strong> because it explores paths level by level (fewest moves first).</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><span>Python</span><span class="code-lang">ai_solver.py</span></div>
+    <pre><span class="kw">from</span> collections <span class="kw">import</span> deque
+
+<span class="kw">def</span> <span class="fn">_bfs</span>(self, start):
+    queue = <span class="fn">deque</span>([start])       <span class="cm"># queue of states to explore</span>
+    visited = {start.<span class="fn">key</span>()}     <span class="cm"># set of states already seen</span>
+
+    <span class="kw">while</span> queue:
+        state = queue.<span class="fn">popleft</span>()  <span class="cm"># take from front (oldest first)</span>
+
+        <span class="kw">for</span> src, dst <span class="kw">in</span> state.<span class="fn">legal_moves</span>():
+            next_state = state.<span class="fn">apply_move</span>(src, dst)
+            <span class="kw">if</span> next_state.<span class="fn">key</span>() <span class="kw">in</span> visited: <span class="kw">continue</span>
+            <span class="kw">if</span> next_state.<span class="fn">is_won</span>():
+                <span class="kw">return</span> next_state.path  <span class="cm"># 🎉 found solution!</span>
+            visited.<span class="fn">add</span>(next_state.<span class="fn">key</span>())
+            queue.<span class="fn">append</span>(next_state)
+
+    <span class="kw">return None</span>  <span class="cm"># no solution exists</span></pre>
+  </div>
+
+  <h3>A* Algorithm</h3>
+  <div class="box box-purple">
+    <div class="box-label">📖 What is A*?</div>
+    <p>A* improves on BFS by using a <strong>heuristic</strong> — an estimate of how close a state is to the solution. Instead of exploring everything equally, A* prioritizes states that look more promising. It uses a <strong>priority queue</strong> (heap) ordered by <code>cost + estimate</code>. This makes it much faster for complex puzzles.</p>
+  </div>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Algorithm</th><th>When Used</th><th>Guarantee</th><th>Speed</th></tr></thead>
+    <tbody>
+      <tr><td><strong>BFS</strong></td><td>Small puzzles (complexity ≤ 24)</td><td>Optimal (fewest moves)</td><td>Slower on large puzzles</td></tr>
+      <tr><td><strong>A*</strong></td><td>Large puzzles (complexity > 24)</td><td>Near-optimal</td><td>Much faster with heuristic</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>State Hashing</h3>
+  <p>To avoid exploring the same game state twice, each state is converted to a unique string:</p>
+  <div class="code-wrap">
+    <div class="code-header"><span>Python</span><span class="code-lang">ai_solver.py</span></div>
+    <pre><span class="kw">def</span> <span class="fn">key</span>(self) -> str:
+    <span class="cm"># Convert tube state to a unique string</span>
+    <span class="cm"># e.g. "red,blue|green,red||blue,blue"</span>
+    <span class="kw">return</span> <span class="str">"|"</span>.<span class="fn">join</span>(<span class="str">","</span>.<span class="fn">join</span>(t[<span class="str">"layers"</span>]) <span class="kw">for</span> t <span class="kw">in</span> self.tubes)</pre>
+  </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="difficulty">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 09</div>
+    <h2>Backend — Dynamic Difficulty</h2>
+    <p>How the game adapts to your skill level automatically.</p>
+  </div>
+
+  <p><strong>File:</strong> <code>backend/difficulty_manager.py</code></p>
+
+  <p>A <code>difficulty_score</code> (0.0 to 1.0) is maintained per session. After each level is solved, it adjusts based on how fast you were:</p>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Time vs Expected</th><th>What It Means</th><th>Score Change</th></tr></thead>
+    <tbody>
+      <tr><td>Less than 50% of expected</td><td>Very fast — you're a pro!</td><td>+0.15 (harder)</td></tr>
+      <tr><td>50%–80% of expected</td><td>Fast</td><td>+0.07 (slightly harder)</td></tr>
+      <tr><td>80%–120% of expected</td><td>Just right</td><td>No change</td></tr>
+      <tr><td>120%–180% of expected</td><td>Struggling a bit</td><td>-0.07 (slightly easier)</td></tr>
+      <tr><td>More than 180% of expected</td><td>Very slow — need help</td><td>-0.15 (easier)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Procedural Level Generation</h3>
+  <p>For levels beyond 10, the game generates puzzles algorithmically — guaranteed to be solvable because they start from a solved state and shuffle backwards:</p>
+  <div class="code-wrap">
+    <div class="code-header"><span>Python</span><span class="code-lang">difficulty_manager.py</span></div>
+    <pre><span class="kw">def</span> <span class="fn">_generate_procedural</span>(self, level):
+    <span class="cm"># 1. Start from solved state (each color fills one tube)</span>
+    tubes_solved = [[color] * capacity <span class="kw">for</span> color <span class="kw">in</span> color_ids]
+
+    <span class="cm"># 2. Apply random valid pours to scramble it</span>
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(level * <span class="num">20</span> + <span class="num">50</span>):
+        src = random.<span class="fn">choice</span>(non_empty)
+        dst = random.<span class="fn">choice</span>(non_full)
+        <span class="cm"># ... apply the pour ...</span>
+
+    <span class="cm"># Result is always solvable because it came from a solved state!</span>
+    <span class="kw">return</span> tube_dicts</pre>
+  </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="analytics">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 10</div>
+    <h2>Backend — Analytics</h2>
+    <p>How the game tracks and stores player statistics.</p>
+  </div>
+
+  <p><strong>File:</strong> <code>backend/analytics.py</code></p>
+
+  <p>Every interaction is recorded in an in-memory dictionary during the session, then written to SQLite when the level is completed:</p>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Metric</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>time_taken</code></td><td>float (seconds)</td><td>How long it took to solve the level</td></tr>
+      <tr><td><code>moves</code></td><td>integer</td><td>Total successful pour moves</td></tr>
+      <tr><td><code>undo_count</code></td><td>integer</td><td>How many times undo was used</td></tr>
+      <tr><td><code>failed_attempts</code></td><td>integer</td><td>How many invalid moves were tried</td></tr>
+      <tr><td><code>heatmap</code></td><td>dict {tube_index: clicks}</td><td>Which tubes were clicked most</td></tr>
+      <tr><td><code>won</code></td><td>boolean</td><td>Whether the level was completed</td></tr>
+    </tbody>
+  </table></div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="sqlite">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 11</div>
+    <h2>Backend — SQLite Database</h2>
+    <p>How game data is stored permanently.</p>
+  </div>
+
+  <p><strong>File:</strong> <code>backend/models.py</code></p>
+
+  <div class="box box-cyan">
+    <div class="box-label">📖 What is SQLite?</div>
+    <p>SQLite is a database that stores data in a single file (<code>game.db</code>). Unlike MySQL or PostgreSQL, it needs no separate server — Python's built-in <code>sqlite3</code> module reads and writes to it directly. It's perfect for projects that don't need to handle thousands of simultaneous users.</p>
+  </div>
+
+  <h3>Database Tables</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span>SQL</span><span class="code-lang">models.py — table definitions</span></div>
+    <pre><span class="cm">-- Stores saved game states</span>
+CREATE TABLE game_saves (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id  TEXT UNIQUE NOT NULL,
+    level       INTEGER NOT NULL,
+    state_json  TEXT NOT NULL,     <span class="cm">-- entire game state as JSON string</span>
+    updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+<span class="cm">-- Stores completed session analytics</span>
+CREATE TABLE analytics_records (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id      TEXT NOT NULL,
+    level           INTEGER NOT NULL,
+    time_taken      REAL,
+    moves           INTEGER,
+    undo_count      INTEGER,
+    failed_attempts INTEGER,
+    won             INTEGER,       <span class="cm">-- 0 or 1 (SQLite has no boolean)</span>
+    heatmap_json    TEXT           <span class="cm">-- {tube_index: clicks} as JSON</span>
+);</pre>
+  </div>
+
+  <h3>How Save/Load Works</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>After every move</h4>
+        <p>The entire GameEngine state (all tube layers) is serialized to JSON and saved to the <code>game_saves</code> table with the player's session_id.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>When player clicks "Load"</h4>
+        <p>The session_id is sent to <code>GET /api/load</code>. The server queries SQLite for that session_id, deserializes the JSON, and recreates the GameEngine object.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Game continues</h4>
+        <p>The loaded state is sent back to the frontend as a normal API response. The frontend renders the tubes exactly as they were when saved.</p>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="git">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 12</div>
+    <h2>Deployment — Git & GitHub</h2>
+    <p>How your code gets from your computer to the internet.</p>
+  </div>
+
+  <div class="box box-blue">
+    <div class="box-label">📖 What is Git?</div>
+    <p><strong>Git</strong> is a version control system installed on your computer. It tracks every change you make to your code files. <strong>GitHub</strong> is a website that stores your Git repository (your code + all its history) online. Deployment platforms like Render and Vercel connect to GitHub to automatically download and deploy your code.</p>
+  </div>
+
+  <h3>Key Git Commands Used</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Command</th><th>What It Does</th></tr></thead>
+    <tbody>
+      <tr><td><code>git init</code></td><td>Creates a new Git repository in the current folder</td></tr>
+      <tr><td><code>git add .</code></td><td>Stages all changed files — tells Git "track these changes"</td></tr>
+      <tr><td><code>git commit -m "message"</code></td><td>Saves a permanent snapshot of all staged changes with a description</td></tr>
+      <tr><td><code>git branch -M main</code></td><td>Renames default branch to "main"</td></tr>
+      <tr><td><code>git remote add origin URL</code></td><td>Links your local repo to the GitHub repo</td></tr>
+      <tr><td><code>git push -u origin main</code></td><td>Uploads all commits to GitHub</td></tr>
+      <tr><td><code>git pull origin main</code></td><td>Downloads changes from GitHub to your computer</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>The Workflow After Initial Setup</h3>
+  <div class="flow">
+    <div class="flow-box blue">Edit files locally</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">git add .</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">git commit</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">git push</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box green">Auto-deploy on Render + Vercel</div>
+  </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="render">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 13</div>
+    <h2>Deployment — Render (Backend)</h2>
+    <p>How the Python Flask server runs 24/7 on the internet.</p>
+  </div>
+
+  <div class="box box-green">
+    <div class="box-label">📖 What is Render?</div>
+    <p>Render is a cloud hosting platform. You give it your GitHub repo, tell it how to start your app, and it runs it on a server in a data center. Anyone in the world can then make HTTP requests to your Flask API.</p>
+  </div>
+
+  <h3>Required Files for Render</h3>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>File</th><th>Contents</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>requirements.txt</code></td><td><code>flask==3.0.2<br>flask-cors==4.0.0<br>gunicorn==21.2.0</code></td><td>Tells Render which Python packages to install</td></tr>
+      <tr><td><code>Procfile</code></td><td><code>web: gunicorn app:app</code></td><td>Tells Render the command to start your server</td></tr>
+      <tr><td><code>runtime.txt</code></td><td><code>python-3.11.0</code></td><td>Tells Render which Python version to use</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box box-orange">
+    <div class="box-label">💡 Why Gunicorn instead of Flask's built-in server?</div>
+    <p>Flask's development server (<code>python app.py</code>) only handles one request at a time and isn't safe for production. <strong>Gunicorn</strong> (Green Unicorn) is a production-grade WSGI server that runs multiple worker processes simultaneously, making it much faster and more reliable under real traffic.</p>
+  </div>
+
+  <h3>How Render Builds Your App</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Render clones your GitHub repo</h4>
+        <p>It downloads the latest code from <code>github.com/metadore/watersortgame</code></p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Render runs the build command</h4>
+        <p><code>pip install -r requirements.txt</code> — installs Flask, flask-cors, and gunicorn</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Render runs the start command</h4>
+        <p><code>gunicorn app:app</code> — starts the Flask app with Gunicorn. The <code>app:app</code> means "from the file <code>app.py</code>, use the Flask object named <code>app</code>"</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Your API is live!</h4>
+        <p>Render assigns a URL like <code>https://watersortgame-backend.onrender.com</code>. Any HTTP request to this URL reaches your Flask server.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="box box-red">
+    <div class="box-label">⚠️ Free Tier Limitation</div>
+    <p>On Render's free plan, the server <strong>spins down after 15 minutes of no traffic</strong>. The next request causes a cold start (~30 seconds delay). This is normal. Paid plans stay always-on.</p>
+  </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="vercel">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 14</div>
+    <h2>Deployment — Vercel (Frontend)</h2>
+    <p>How the HTML/CSS/JS files are served globally.</p>
+  </div>
+
+  <div class="box box-blue">
+    <div class="box-label">📖 What is Vercel?</div>
+    <p>Vercel is a platform specialized in hosting frontend files (HTML, CSS, JavaScript). It uses a global <strong>CDN</strong> (Content Delivery Network) — copies of your files are stored in data centers worldwide, so users always download from the nearest server. This makes pages load extremely fast.</p>
+  </div>
+
+  <h3>How Vercel Deployment Works</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Vercel connects to GitHub</h4>
+        <p>You authorize Vercel to read your <code>watersortgame</code> repository</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Root Directory set to <code>frontend</code></h4>
+        <p>Tells Vercel to only serve the files in the <code>frontend/</code> folder, not the Python backend files</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Vercel copies files to CDN</h4>
+        <p>Your <code>index.html</code>, <code>styles.css</code>, <code>app.js</code> etc. are distributed globally</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Auto-deploy on every push</h4>
+        <p>Every time you <code>git push</code> to GitHub, Vercel automatically redeploys within ~1 minute</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Vercel vs Render — Why Both?</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th></th><th>Vercel</th><th>Render</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Best for</strong></td><td>Static files (HTML/CSS/JS)</td><td>Running servers (Python/Node)</td></tr>
+      <tr><td><strong>Executes code?</strong></td><td>No — just serves files</td><td>Yes — runs Python continuously</td></tr>
+      <tr><td><strong>Speed</strong></td><td>Extremely fast (CDN)</td><td>Fast (single server)</td></tr>
+      <tr><td><strong>Free tier</strong></td><td>Unlimited static hosting</td><td>$5 credit/month</td></tr>
+      <tr><td><strong>Sleep on inactivity?</strong></td><td>No (always fast)</td><td>Yes (free tier)</td></tr>
+    </tbody>
+  </table></div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="how-it-connects">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 15</div>
+    <h2>How Everything Connects</h2>
+    <p>The complete picture of your deployed game.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><span>Architecture</span><span class="code-lang">Full deployment diagram</span></div>
+    <pre>
+  YOUR COMPUTER                GITHUB
+  ┌──────────────┐             ┌─────────────────────────┐
+  │ WaterSortGame│──git push──▶│ metadore/watersortgame  │
+  │ (local files)│             └──────┬──────────────────┘
+  └──────────────┘                    │
+                                      │ auto-trigger
+                          ┌───────────┴──────────────┐
+                          │                          │
+                    RENDER (backend)          VERCEL (frontend)
+              ┌─────────────────────┐    ┌──────────────────────┐
+              │ python app.py       │    │ index.html           │
+              │ SQLite game.db      │    │ styles.css           │
+              │ Port 8080           │    │ app.js               │
+              └──────────┬──────────┘    └──────────┬───────────┘
+                         │                          │
+                   API calls (JSON)         Browser loads page
+                         │                          │
+                    ┌────┴──────────────────────────┴────┐
+                    │         USER'S BROWSER              │
+                    │   Loads page from Vercel CDN        │
+                    │   Game logic calls Render API       │
+                    └─────────────────────────────────────┘</pre>
+  </div>
+
+  <h3>A Complete User Journey</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>User opens the game URL</h4>
+        <p>Browser requests <code>https://watersortgame.vercel.app</code> — Vercel CDN returns <code>index.html</code> in milliseconds from the nearest data center</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Browser loads CSS and JS</h4>
+        <p>Browser reads the HTML, sees links to <code>styles.css</code>, <code>app.js</code>, etc. and fetches them all from Vercel CDN</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>JavaScript initializes the game</h4>
+        <p><code>app.js</code> runs — calls <code>GET https://watersortgame-backend.onrender.com/api/start-level?level=1</code>. Render wakes up (if sleeping), Flask processes the request, returns tube data as JSON.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Tubes render on screen</h4>
+        <p>JavaScript receives the JSON, calls <code>renderTubes(data.tubes)</code> — creates HTML elements dynamically, applies CSS gradient classes. Player sees the game!</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>Player clicks tubes</h4>
+        <p>Each click triggers <code>onTubeClick()</code> → <code>executePour()</code> → <code>POST /api/move</code> to Render → Flask validates → JSON back → DOM updates. The cycle repeats for every move.</p>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="api-reference">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 16</div>
+    <h2>Complete API Reference</h2>
+    <p>Every endpoint your frontend calls on the backend.</p>
+  </div>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Method</th><th>Endpoint</th><th>Body / Params</th><th>Returns</th></tr></thead>
+    <tbody>
+      <tr><td><code>GET</code></td><td><code>/api/start-level</code></td><td><code>?level=N&session_id=X</code></td><td>Full game state + tube data</td></tr>
+      <tr><td><code>POST</code></td><td><code>/api/move</code></td><td><code>{session_id, from_tube, to_tube}</code></td><td>Success/fail, updated tubes, is_won</td></tr>
+      <tr><td><code>POST</code></td><td><code>/api/undo</code></td><td><code>{session_id}</code></td><td>Updated tubes after undo</td></tr>
+      <tr><td><code>POST</code></td><td><code>/api/restart</code></td><td><code>{session_id}</code></td><td>Fresh level state</td></tr>
+      <tr><td><code>GET</code></td><td><code>/api/ai-solve</code></td><td><code>?session_id=X</code></td><td>Array of step objects [{step, from_tube, to_tube}]</td></tr>
+      <tr><td><code>GET</code></td><td><code>/api/analytics</code></td><td>—</td><td>Session summary + DB records</td></tr>
+      <tr><td><code>POST</code></td><td><code>/api/voice-command</code></td><td><code>{session_id, text}</code></td><td>Parsed action + updated game state</td></tr>
+      <tr><td><code>POST</code></td><td><code>/api/save</code></td><td><code>{session_id}</code></td><td><code>{saved: true}</code></td></tr>
+      <tr><td><code>GET</code></td><td><code>/api/load</code></td><td><code>?session_id=X</code></td><td>Saved game state or 404</td></tr>
+      <tr><td><code>GET</code></td><td><code>/api/colors</code></td><td>—</td><td>Array of color definitions with CSS gradients</td></tr>
+    </tbody>
+  </table></div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="file-structure">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 17</div>
+    <h2>Complete File Structure</h2>
+    <p>Every file in the project and what it does.</p>
+  </div>
+
+  <div class="file-tree">
+    <span class="ft-folder">WaterSortGame/</span>
+    <span class="ft-indent"><span class="ft-folder">backend/</span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">app.py</span> <span class="ft-comment">— Flask server, all 10 API routes, voice parser, CORS</span></span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">game_engine.py</span> <span class="ft-comment">— Tube class, GameEngine class, undo stack, win detection</span></span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">ai_solver.py</span> <span class="ft-comment">— AISolver class with BFS + A* algorithms</span></span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">difficulty_manager.py</span> <span class="ft-comment">— 10 predefined levels + procedural generator</span></span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">analytics.py</span> <span class="ft-comment">— In-session analytics recorder (no DB dependency)</span></span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">models.py</span> <span class="ft-comment">— SQLite read/write only (no game logic)</span></span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">requirements.txt</span> <span class="ft-comment">— Python packages for Render to install</span></span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">Procfile</span> <span class="ft-comment">— Start command: gunicorn app:app</span></span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">runtime.txt</span> <span class="ft-comment">— Python version: python-3.11.0</span></span></span>
+    <span class="ft-indent"><span class="ft-folder">frontend/</span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">index.html</span> <span class="ft-comment">— Main game page, all overlays, sidebar, game arena</span></span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">styles.css</span> <span class="ft-comment">— All CSS: dark theme, gradients, animations, responsive</span></span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">app.js</span> <span class="ft-comment">— Main controller: state, API calls, rendering, events</span></span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">animations.js</span> <span class="ft-comment">— Pour particles, shake, confetti, ripple effects</span></span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">voice_control.js</span> <span class="ft-comment">— Web Speech API recognition + backend integration</span></span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">visualizer.js</span> <span class="ft-comment">— Chart.js helpers for analytics dashboard</span></span></span>
+    <span class="ft-indent"><span class="ft-folder">templates/</span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">learn.html</span> <span class="ft-comment">— Educational page with interactive simulation</span></span></span>
+    <span class="ft-indent"><span class="ft-folder">static/</span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-folder">sounds/</span> <span class="ft-comment">— Audio files (.mp3)</span></span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-folder">assets/</span> <span class="ft-comment">— Images</span></span></span>
+    <span class="ft-indent"><span class="ft-folder">database/</span></span>
+    <span class="ft-indent"><span class="ft-indent"><span class="ft-file">game.db</span> <span class="ft-comment">— Auto-created SQLite database file</span></span></span>
+    <span class="ft-indent"><span class="ft-file">README.md</span> <span class="ft-comment">— Project documentation for GitHub</span></span>
+  </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="glossary">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 18</div>
+    <h2>Glossary — Key Terms</h2>
+    <p>Simple definitions for every technical word used in this project.</p>
+  </div>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Term</th><th>Simple Definition</th></tr></thead>
+    <tbody>
+      <tr><td><strong>API</strong></td><td>A way for two programs to talk to each other. Your frontend "asks" the backend for data, and the backend "answers" with JSON.</td></tr>
+      <tr><td><strong>REST API</strong></td><td>A specific style of API that uses HTTP methods (GET, POST) and URLs to define what action to take.</td></tr>
+      <tr><td><strong>JSON</strong></td><td>JavaScript Object Notation — a text format for sending data between programs. Looks like: <code>{"key": "value", "num": 42}</code></td></tr>
+      <tr><td><strong>HTTP</strong></td><td>The protocol (set of rules) that browsers and servers use to communicate. GET means "give me data", POST means "here's data, process it".</td></tr>
+      <tr><td><strong>DOM</strong></td><td>Document Object Model — the live representation of your HTML page in the browser. JavaScript can read and modify it to change what you see.</td></tr>
+      <tr><td><strong>CDN</strong></td><td>Content Delivery Network — a network of servers worldwide that store copies of your files so users download from the closest one.</td></tr>
+      <tr><td><strong>CORS</strong></td><td>A browser security feature that blocks requests to different domains. Flask-CORS adds headers to allow your Vercel frontend to call your Render backend.</td></tr>
+      <tr><td><strong>Session</strong></td><td>A unique identifier (UUID) for one player's game. Used to look up their game state on the server.</td></tr>
+      <tr><td><strong>BFS</strong></td><td>Breadth-First Search — explores all possible moves level by level, guaranteeing the shortest solution.</td></tr>
+      <tr><td><strong>A*</strong></td><td>A search algorithm that uses a heuristic (educated guess) to explore the most promising paths first — faster than BFS for complex puzzles.</td></tr>
+      <tr><td><strong>Heuristic</strong></td><td>An estimate or "rule of thumb" that guides a search algorithm. In A*, it estimates how close a state is to the solution.</td></tr>
+      <tr><td><strong>SQLite</strong></td><td>A simple file-based database. All data lives in a single <code>.db</code> file. No separate database server needed.</td></tr>
+      <tr><td><strong>Gunicorn</strong></td><td>A production Python web server. More powerful than Flask's built-in server — handles multiple requests at once.</td></tr>
+      <tr><td><strong>Git</strong></td><td>A tool that tracks changes to your code files, letting you undo changes and see history.</td></tr>
+      <tr><td><strong>Commit</strong></td><td>A saved snapshot of your code at a specific point in time, with a description of what changed.</td></tr>
+      <tr><td><strong>Repository (Repo)</strong></td><td>A folder containing your code plus its entire Git history.</td></tr>
+      <tr><td><strong>Deploy</strong></td><td>Making your application available on the internet by uploading it to a cloud server.</td></tr>
+      <tr><td><strong>Environment Variable</strong></td><td>A configuration value (like an API key or URL) stored outside your code so it can be different in production vs development.</td></tr>
+      <tr><td><strong>Async/Await</strong></td><td>JavaScript syntax for handling operations that take time (like API calls) without freezing the browser.</td></tr>
+      <tr><td><strong>Decorator</strong></td><td>In Python, <code>@app.route()</code> is a decorator — it "decorates" a function with extra behaviour (making it handle a URL).</td></tr>
+      <tr><td><strong>Class</strong></td><td>A blueprint for creating objects. <code>Tube</code> and <code>GameEngine</code> are classes — each game has its own instances of these.</td></tr>
+      <tr><td><strong>localStorage</strong></td><td>A browser storage area that persists data even after the page is closed. Used for dark mode preference and session ID.</td></tr>
+      <tr><td><strong>fetch()</strong></td><td>A built-in JavaScript function for making HTTP requests to APIs. Returns a Promise (async result).</td></tr>
+      <tr><td><strong>Regex</strong></td><td>Regular Expression — a pattern for matching text. Used to parse voice commands like "pour red into tube 2".</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box box-green" style="margin-top:2rem">
+    <div class="box-label">🎉 Congratulations!</div>
+    <p>You built and deployed a complete full-stack web application with AI, voice control, analytics, and adaptive difficulty. That's a real, production-quality project — be proud of it! Share it on your resume, LinkedIn, and portfolio.</p>
+  </div>
+
+  </div>
+
+</main>
+</div>
+</body>
+</html>
